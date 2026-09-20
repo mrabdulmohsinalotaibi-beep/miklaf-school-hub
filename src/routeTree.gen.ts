@@ -13,6 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as CounselingRouteImport } from './routes/counseling'
 import { Route as MessagesRouteImport } from './routes/messages'
+import { Route as PermissionsRouteImport } from './routes/permissions'
+import { Route as PlanRouteImport } from './routes/plan'
+import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as StudentsRouteImport } from './routes/students'
 
 const IndexRoute = IndexRouteImport.update({
@@ -35,6 +39,26 @@ const MessagesRoute = MessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PermissionsRoute = PermissionsRouteImport.update({
+  id: '/permissions',
+  path: '/permissions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlanRoute = PlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudentsRoute = StudentsRouteImport.update({
   id: '/students',
   path: '/students',
@@ -46,6 +70,10 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof CalendarRoute
   '/counseling': typeof CounselingRoute
   '/messages': typeof MessagesRoute
+  '/permissions': typeof PermissionsRoute
+  '/plan': typeof PlanRoute
+  '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
   '/students': typeof StudentsRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +81,10 @@ export interface FileRoutesByTo {
   '/calendar': typeof CalendarRoute
   '/counseling': typeof CounselingRoute
   '/messages': typeof MessagesRoute
+  '/permissions': typeof PermissionsRoute
+  '/plan': typeof PlanRoute
+  '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
   '/students': typeof StudentsRoute
 }
 export interface FileRoutesById {
@@ -61,14 +93,46 @@ export interface FileRoutesById {
   '/calendar': typeof CalendarRoute
   '/counseling': typeof CounselingRoute
   '/messages': typeof MessagesRoute
+  '/permissions': typeof PermissionsRoute
+  '/plan': typeof PlanRoute
+  '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
   '/students': typeof StudentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calendar' | '/counseling' | '/messages' | '/students'
+  fullPaths:
+    | '/'
+    | '/calendar'
+    | '/counseling'
+    | '/messages'
+    | '/permissions'
+    | '/plan'
+    | '/reports'
+    | '/settings'
+    | '/students'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calendar' | '/counseling' | '/messages' | '/students'
-  id: '__root__' | '/' | '/calendar' | '/counseling' | '/messages' | '/students'
+  to:
+    | '/'
+    | '/calendar'
+    | '/counseling'
+    | '/messages'
+    | '/permissions'
+    | '/plan'
+    | '/reports'
+    | '/settings'
+    | '/students'
+  id:
+    | '__root__'
+    | '/'
+    | '/calendar'
+    | '/counseling'
+    | '/messages'
+    | '/permissions'
+    | '/plan'
+    | '/reports'
+    | '/settings'
+    | '/students'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +140,10 @@ export interface RootRouteChildren {
   CalendarRoute: typeof CalendarRoute
   CounselingRoute: typeof CounselingRoute
   MessagesRoute: typeof MessagesRoute
+  PermissionsRoute: typeof PermissionsRoute
+  PlanRoute: typeof PlanRoute
+  ReportsRoute: typeof ReportsRoute
+  SettingsRoute: typeof SettingsRoute
   StudentsRoute: typeof StudentsRoute
 }
 
@@ -109,6 +177,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/permissions': {
+      id: '/permissions'
+      path: '/permissions'
+      fullPath: '/permissions'
+      preLoaderRoute: typeof PermissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plan': {
+      id: '/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof PlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/students': {
       id: '/students'
       path: '/students'
@@ -124,6 +220,10 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarRoute: CalendarRoute,
   CounselingRoute: CounselingRoute,
   MessagesRoute: MessagesRoute,
+  PermissionsRoute: PermissionsRoute,
+  PlanRoute: PlanRoute,
+  ReportsRoute: ReportsRoute,
+  SettingsRoute: SettingsRoute,
   StudentsRoute: StudentsRoute,
 }
 export const routeTree = rootRouteImport
