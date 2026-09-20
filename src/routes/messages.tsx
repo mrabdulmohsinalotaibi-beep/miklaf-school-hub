@@ -24,11 +24,11 @@ export const Route = createFileRoute("/messages")({
 });
 
 function MessagesPage() {
-  const [activeId, setActiveId] = useState(conversations[0].id);
+  const [activeId, setActiveId] = useState(conversations[0]!.id);
   const [thread, setThread] = useState(messageThread);
   const [draft, setDraft] = useState("");
 
-  const active = conversations.find((item) => item.id === activeId) ?? conversations[0];
+  const active = conversations.find((item) => item.id === activeId) ?? conversations[0]!;
 
   const handleSend = (event: FormEvent) => {
     event.preventDefault();

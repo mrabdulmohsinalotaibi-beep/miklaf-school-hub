@@ -24,7 +24,7 @@ export const Route = createFileRoute("/students")({
 function StudentsPage() {
   const [query, setQuery] = useState("");
   const [grade, setGrade] = useState("الكل");
-  const [selectedId, setSelectedId] = useState(students[0].id);
+  const [selectedId, setSelectedId] = useState(students[0]!.id);
 
   const grades = ["الكل", ...Array.from(new Set(students.map((s) => s.grade)))];
 
@@ -38,7 +38,7 @@ function StudentsPage() {
     [query, grade],
   );
 
-  const selected = students.find((student) => student.id === selectedId) ?? students[0];
+  const selected = students.find((student) => student.id === selectedId) ?? students[0]!;
 
   return (
     <AppShell title="سجل الطلاب">
