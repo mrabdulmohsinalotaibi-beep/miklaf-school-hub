@@ -233,7 +233,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   <Settings size={15} /> الإعدادات
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onSelect={() => void handleSignOut()}>
+                <DropdownMenuItem className="text-destructive" onSelect={() => void handleSignOut()}>
                   <LogOut size={15} /> تسجيل الخروج
                 </DropdownMenuItem>
               </DropdownMenuContent>
