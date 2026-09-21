@@ -10,141 +10,33 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CalendarRouteImport } from './routes/calendar'
-import { Route as CounselingRouteImport } from './routes/counseling'
-import { Route as MessagesRouteImport } from './routes/messages'
-import { Route as PermissionsRouteImport } from './routes/permissions'
-import { Route as PlanRouteImport } from './routes/plan'
-import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as StudentsRouteImport } from './routes/students'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CalendarRoute = CalendarRouteImport.update({
-  id: '/calendar',
-  path: '/calendar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CounselingRoute = CounselingRouteImport.update({
-  id: '/counseling',
-  path: '/counseling',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessagesRoute = MessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PermissionsRoute = PermissionsRouteImport.update({
-  id: '/permissions',
-  path: '/permissions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlanRoute = PlanRouteImport.update({
-  id: '/plan',
-  path: '/plan',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StudentsRoute = StudentsRouteImport.update({
-  id: '/students',
-  path: '/students',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/calendar': typeof CalendarRoute
-  '/counseling': typeof CounselingRoute
-  '/messages': typeof MessagesRoute
-  '/permissions': typeof PermissionsRoute
-  '/plan': typeof PlanRoute
-  '/reports': typeof ReportsRoute
-  '/settings': typeof SettingsRoute
-  '/students': typeof StudentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/calendar': typeof CalendarRoute
-  '/counseling': typeof CounselingRoute
-  '/messages': typeof MessagesRoute
-  '/permissions': typeof PermissionsRoute
-  '/plan': typeof PlanRoute
-  '/reports': typeof ReportsRoute
-  '/settings': typeof SettingsRoute
-  '/students': typeof StudentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/calendar': typeof CalendarRoute
-  '/counseling': typeof CounselingRoute
-  '/messages': typeof MessagesRoute
-  '/permissions': typeof PermissionsRoute
-  '/plan': typeof PlanRoute
-  '/reports': typeof ReportsRoute
-  '/settings': typeof SettingsRoute
-  '/students': typeof StudentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/calendar'
-    | '/counseling'
-    | '/messages'
-    | '/permissions'
-    | '/plan'
-    | '/reports'
-    | '/settings'
-    | '/students'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/calendar'
-    | '/counseling'
-    | '/messages'
-    | '/permissions'
-    | '/plan'
-    | '/reports'
-    | '/settings'
-    | '/students'
-  id:
-    | '__root__'
-    | '/'
-    | '/calendar'
-    | '/counseling'
-    | '/messages'
-    | '/permissions'
-    | '/plan'
-    | '/reports'
-    | '/settings'
-    | '/students'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CalendarRoute: typeof CalendarRoute
-  CounselingRoute: typeof CounselingRoute
-  MessagesRoute: typeof MessagesRoute
-  PermissionsRoute: typeof PermissionsRoute
-  PlanRoute: typeof PlanRoute
-  ReportsRoute: typeof ReportsRoute
-  SettingsRoute: typeof SettingsRoute
-  StudentsRoute: typeof StudentsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -156,75 +48,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/calendar': {
-      id: '/calendar'
-      path: '/calendar'
-      fullPath: '/calendar'
-      preLoaderRoute: typeof CalendarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/counseling': {
-      id: '/counseling'
-      path: '/counseling'
-      fullPath: '/counseling'
-      preLoaderRoute: typeof CounselingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages': {
-      id: '/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof MessagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/permissions': {
-      id: '/permissions'
-      path: '/permissions'
-      fullPath: '/permissions'
-      preLoaderRoute: typeof PermissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/plan': {
-      id: '/plan'
-      path: '/plan'
-      fullPath: '/plan'
-      preLoaderRoute: typeof PlanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/students': {
-      id: '/students'
-      path: '/students'
-      fullPath: '/students'
-      preLoaderRoute: typeof StudentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CalendarRoute: CalendarRoute,
-  CounselingRoute: CounselingRoute,
-  MessagesRoute: MessagesRoute,
-  PermissionsRoute: PermissionsRoute,
-  PlanRoute: PlanRoute,
-  ReportsRoute: ReportsRoute,
-  SettingsRoute: SettingsRoute,
-  StudentsRoute: StudentsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
