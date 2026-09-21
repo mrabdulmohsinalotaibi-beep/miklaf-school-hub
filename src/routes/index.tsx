@@ -1,219 +1,214 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { ArrowLeft, CalendarDays, Clock } from "lucide-react";
-import { AppShell } from "@/components/miklaf/AppShell";
-import { Bar, Chip, Panel } from "@/components/miklaf/primitives";
-import {
-  activities,
-  attendanceTrend,
-  calendarEvents,
-  classes,
-  counselingCases,
-  school,
-  stats,
-  toneClasses,
-} from "@/lib/miklaf-data";
+  BarChart3,
+  CalendarClock,
+  ClipboardList,
+  HeartHandshake,
+  LayoutDashboard,
+  Lock,
+  MessagesSquare,
+  MoveLeft,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "لوحة المتابعة — مِكلاف" },
+      { title: "مِكلاف — منصة إدارة المدرسة والإرشاد الطلابي" },
       {
         name: "description",
-        content: "نظرة شاملة على الحضور والحالات الإرشادية وآخر الأنشطة في المدرسة.",
+        content:
+          "منصة عربية متكاملة لإدارة الطلاب والحضور والحالات الإرشادية والمواعيد والخطة التشغيلية والتقارير، بواجهة حديثة وصلاحيات آمنة.",
       },
-      { property: "og:title", content: "لوحة المتابعة — مِكلاف" },
+      { property: "og:title", content: "مِكلاف — منصة إدارة المدرسة والإرشاد الطلابي" },
       {
         property: "og:description",
-        content: "نظرة شاملة على الحضور والحالات الإرشادية وآخر الأنشطة في المدرسة.",
+        content: "أدِر مدرستك من مكان واحد: الطلاب، الحضور، الإرشاد، المواعيد، التقارير.",
       },
     ],
   }),
-  component: DashboardPage,
+  component: LandingPage,
 });
 
-function DashboardPage() {
-  const activeCases = counselingCases.filter((item) => item.status !== "مغلقة");
+const features = [
+  { icon: LayoutDashboard, title: "لوحة متابعة ذكية", desc: "مؤشرات فورية للطلاب والحضور والحالات والمواعيد." },
+  { icon: Users, title: "سجل طلاب متكامل", desc: "بحث وتصفية وملف شامل لكل طالب أكاديميًا وسلوكيًا." },
+  { icon: ClipboardList, title: "رصد الحضور اليومي", desc: "تسجيل سريع لكل فصل وتقارير للغياب والتأخر." },
+  { icon: HeartHandshake, title: "الإرشاد الطلابي", desc: "فتح الحالات وتتبع الجلسات والملاحظات ومواعيد المتابعة." },
+  { icon: CalendarClock, title: "المواعيد والمقابلات", desc: "جدولة المقابلات مع أولياء الأمور بعرض تقويمي." },
+  { icon: MessagesSquare, title: "إعلانات داخلية", desc: "تواصل منظم بين الإدارة والمعلمين والموجهين." },
+  { icon: BarChart3, title: "تقارير قابلة للتصدير", desc: "تقارير مفلترة مع تصدير إلى إكسل ونسخة للطباعة." },
+  { icon: ShieldCheck, title: "صلاحيات وأدوار", desc: "مدير، موجه طلابي، معلم — كل دور يرى ما يخصه." },
+];
 
+const steps = [
+  { num: "١", title: "أنشئ حسابك", desc: "سجّل ببريدك الإلكتروني واختر دورك الوظيفي، ثم أكّد بريدك." },
+  { num: "٢", title: "أدخل بيانات المدرسة", desc: "أضف الفصول والطلاب أو ابدأ من البيانات التجريبية الجاهزة." },
+  { num: "٣", title: "أدِر يومك المدرسي", desc: "ارصد الحضور، تابع الحالات، جدول المواعيد، وأصدر التقارير." },
+];
+
+function LandingPage() {
   return (
-    <AppShell title="لوحة المتابعة">
-      <div className="space-y-6">
-        <div className="panel overflow-hidden bg-navy p-6 text-navy-foreground sm:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-6">
-            <div>
-              <div className="text-[11px] font-bold tracking-[0.18em] text-gold">
-                {school.term} · {school.year}
-              </div>
-              <h2 className="mt-2 font-display text-2xl font-black sm:text-3xl">
-                صباح الخير، {school.name}
-              </h2>
-              <p className="mt-2 max-w-xl text-sm leading-7 text-navy-foreground/70">
-                جميع مؤشرات المدرسة محدثة لحظيًا: الحضور، الحالات الإرشادية، الخطة التشغيلية،
-                والتقارير.
-              </p>
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-navy font-display text-lg font-black text-gold">
+              م
             </div>
-            <Link
-              to="/reports"
-              className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold transition hover:bg-white/15"
-            >
-              عرض التقارير <ArrowLeft size={15} />
-            </Link>
+            <div>
+              <div className="font-display text-lg font-black">مِكلاف</div>
+              <div className="text-[10px] tracking-[0.18em] text-muted-foreground">
+                منصة إدارة المدرسة
+              </div>
+            </div>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" asChild>
+              <Link to="/login">تسجيل الدخول</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/register">ابدأ الآن</Link>
+            </Button>
           </div>
         </div>
+      </header>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="panel p-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="text-xs font-medium text-muted-foreground">{stat.label}</div>
-                  <div className="mt-2 font-display text-3xl font-black">{stat.value}</div>
-                </div>
-                <Chip tone={stat.tone}>{stat.delta}</Chip>
+      <section className="relative overflow-hidden bg-navy text-navy-foreground">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div className="rise-in">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-gold">
+              <ShieldCheck size={13} /> نظام مدرسي عربي آمن ومتكامل
+            </div>
+            <h1 className="font-display text-4xl font-black leading-[1.25] sm:text-5xl">
+              أدِر مدرستك كاملةً من منصة واحدة
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-8 text-navy-foreground/75">
+              مِكلاف تجمع سجل الطلاب، الحضور اليومي، الإرشاد الطلابي، المواعيد، الرسائل، الخطة
+              التشغيلية والتقارير في واجهة عربية أنيقة، مع صلاحيات دقيقة لكل دور وظيفي.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button size="lg" asChild>
+                <Link to="/register">
+                  أنشئ حسابك المجاني <MoveLeft size={16} />
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/20 bg-white/5 text-navy-foreground hover:bg-white/10 hover:text-navy-foreground"
+                asChild
+              >
+                <Link to="/login">لدي حساب</Link>
+              </Button>
+            </div>
+            <div className="mt-8 flex items-center gap-2 text-xs text-navy-foreground/60">
+              <Lock size={13} /> بيانات محمية بسياسات وصول على مستوى كل سجل
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              { label: "سجل الطلاب", value: "متكامل" },
+              { label: "رصد الحضور", value: "يومي" },
+              { label: "الحالات الإرشادية", value: "متابعة" },
+              { label: "التقارير", value: "قابلة للتصدير" },
+            ].map((card) => (
+              <div
+                key={card.label}
+                className="rounded-[22px] border border-white/10 bg-white/5 p-5 backdrop-blur"
+              >
+                <div className="text-xs text-navy-foreground/60">{card.label}</div>
+                <div className="mt-2 font-display text-2xl font-black text-gold">{card.value}</div>
               </div>
-              <div className="mt-4 flex h-9 items-end gap-1">
-                {stat.spark.map((point, index) => (
-                  <span
-                    key={index}
-                    className={`flex-1 rounded-t ${toneClasses[stat.tone].bar} opacity-80`}
-                    style={{ height: `${point}%` }}
-                  />
-                ))}
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <div className="mb-10 text-center">
+          <h2 className="font-display text-3xl font-black">كل ما تحتاجه المدرسة في مكان واحد</h2>
+          <p className="mt-3 text-sm text-muted-foreground">
+            وحدات مترابطة تغطي العمل اليومي للإدارة والموجهين والمعلمين.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map((feature) => (
+            <div key={feature.title} className="panel p-5 transition-transform hover:-translate-y-1">
+              <div className="mb-3 grid h-11 w-11 place-items-center rounded-2xl bg-sea-soft text-sea">
+                <feature.icon size={20} />
               </div>
-              <div className="mt-3 text-[11px] text-muted-foreground">{stat.note}</div>
+              <div className="font-display text-base font-black">{feature.title}</div>
+              <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{feature.desc}</p>
             </div>
           ))}
         </div>
+      </section>
 
-        <div className="grid gap-5 xl:grid-cols-[1.6fr_1fr]">
-          <Panel title="نسبة الحضور خلال الأسبوع">
-            <div className="h-[260px] w-full" dir="ltr">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={attendanceTrend} margin={{ top: 10, right: 8, left: -20 }}>
-                  <defs>
-                    <linearGradient id="attendance" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-chart-2)" stopOpacity={0.5} />
-                      <stop offset="95%" stopColor="var(--color-chart-2)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="4 4" stroke="var(--color-border)" />
-                  <XAxis dataKey="day" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis domain={[60, 100]} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip />
-                  <Area
-                    type="monotone"
-                    dataKey="حضور"
-                    stroke="var(--color-chart-2)"
-                    fill="url(#attendance)"
-                    strokeWidth={2.5}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </Panel>
-
-          <Panel title="أقرب أحداث التقويم">
-            <div className="space-y-3">
-              {calendarEvents.slice(0, 5).map((event) => (
-                <div key={event.title} className="flex items-center gap-3 rounded-xl p-2 hover:bg-muted">
-                  <div
-                    className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl font-display text-sm font-black ${toneClasses[event.tone].bg} ${toneClasses[event.tone].text}`}
-                  >
-                    {event.day}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-bold">{event.title}</div>
-                    <div className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
-                      <CalendarDays size={11} /> {event.type}
-                    </div>
-                  </div>
+      <section className="bg-secondary py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mb-10 text-center">
+            <h2 className="font-display text-3xl font-black">كيف تبدأ؟</h2>
+            <p className="mt-3 text-sm text-muted-foreground">ثلاث خطوات فقط لتشغيل المنصة في مدرستك.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {steps.map((step) => (
+              <div key={step.num} className="panel p-6">
+                <div className="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-navy font-display text-lg font-black text-gold">
+                  {step.num}
                 </div>
-              ))}
-            </div>
-          </Panel>
-        </div>
-
-        <div className="grid gap-5 xl:grid-cols-[1fr_1fr]">
-          <Panel
-            title="الحالات الإرشادية النشطة"
-            action={
-              <Link to="/counseling" className="text-xs font-bold text-primary">
-                عرض الكل
-              </Link>
-            }
-          >
-            <div className="space-y-3">
-              {activeCases.map((item) => (
-                <div key={item.id} className="rounded-xl border border-border p-3.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-sm font-bold">{item.student}</div>
-                    <Chip
-                      tone={
-                        item.priority === "عالية" ? "rose" : item.priority === "متوسطة" ? "gold" : "sea"
-                      }
-                    >
-                      {item.priority}
-                    </Chip>
-                  </div>
-                  <div className="mt-1 text-[11px] text-muted-foreground">
-                    {item.type} · {item.counselor} · {item.sessions} جلسات
-                  </div>
-                  <div className="mt-3">
-                    <Bar value={item.progress} tone="rose" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Panel>
-
-          <div className="space-y-5">
-            <Panel title="آخر الأنشطة">
-              <div className="space-y-3">
-                {activities.map((item) => (
-                  <div key={item.title} className="flex gap-3">
-                    <span
-                      className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${toneClasses[item.tone].bar}`}
-                    />
-                    <div>
-                      <div className="text-sm font-medium leading-6">{item.title}</div>
-                      <div className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
-                        <Clock size={11} /> {item.who} · {item.time}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                <div className="font-display text-lg font-black">{step.title}</div>
+                <p className="mt-2 text-sm leading-7 text-muted-foreground">{step.desc}</p>
               </div>
-            </Panel>
-
-            <Panel title="حضور الفصول اليوم">
-              <div className="grid gap-3 sm:grid-cols-2">
-                {classes.map((item) => (
-                  <div key={item.name} className="rounded-xl border border-border p-3">
-                    <div className="flex items-center justify-between text-sm font-bold">
-                      <span>فصل {item.name}</span>
-                      <span className="text-muted-foreground">{item.attendance}%</span>
-                    </div>
-                    <div className="mt-2">
-                      <Bar value={item.attendance} tone={item.attendance >= 93 ? "leaf" : "gold"} />
-                    </div>
-                    <div className="mt-2 text-[11px] text-muted-foreground">
-                      {item.teacher} · {item.students} طالبًا
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Panel>
+            ))}
           </div>
         </div>
-      </div>
-    </AppShell>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+        <div className="panel flex flex-col items-center gap-5 bg-navy p-12 text-center text-navy-foreground">
+          <h2 className="font-display text-3xl font-black">جاهز لتنظيم عمل مدرستك؟</h2>
+          <p className="max-w-xl text-sm leading-7 text-navy-foreground/75">
+            ابدأ اليوم بإنشاء حساب مجاني، واستعرض المنصة ببيانات تجريبية جاهزة يمكن حذفها بضغطة واحدة.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button size="lg" asChild>
+              <Link to="/register">إنشاء حساب</Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white/20 bg-white/5 text-navy-foreground hover:bg-white/10 hover:text-navy-foreground"
+              asChild
+            >
+              <Link to="/login">تسجيل الدخول</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-border bg-card">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
+          <div className="flex items-center gap-2">
+            <div className="grid h-8 w-8 place-items-center rounded-xl bg-navy font-display text-sm font-black text-gold">
+              م
+            </div>
+            منصة مِكلاف — إدارة المدرسة والإرشاد الطلابي
+          </div>
+          <div className="flex gap-5">
+            <Link to="/login" className="transition-colors hover:text-foreground">
+              تسجيل الدخول
+            </Link>
+            <Link to="/register" className="transition-colors hover:text-foreground">
+              إنشاء حساب
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }
