@@ -58,7 +58,6 @@ function SettingsPage() {
     setBusy(true);
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
-      // @ts-expect-error current_password is supported by Lovable Cloud auth
       current_password: currentPassword,
     });
     setBusy(false);

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Chip, EmptyState, LoadingRows, PageHeader, Panel } from "@/components/app/ui-kit";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { attendanceStatusLabels, caseStatusLabels, formatDate } from "@/lib/labels";
+import { attendanceLabels, caseStatusLabels, formatDate } from "@/lib/labels";
 
 export const Route = createFileRoute("/_authenticated/students/$id")({
   head: () => ({
@@ -106,7 +106,7 @@ function StudentProfilePage() {
                   >
                     <span>{formatDate(item.date)}</span>
                     <Chip tone={item.status === "present" ? "leaf" : item.status === "absent" ? "rose" : "gold"}>
-                      {attendanceStatusLabels[item.status]}
+                      {attendanceLabels[item.status]}
                     </Chip>
                   </li>
                 ))}
@@ -127,7 +127,7 @@ function StudentProfilePage() {
                       <span className="text-sm font-bold">{item.title}</span>
                       <Chip tone="sea">{caseStatusLabels[item.status]}</Chip>
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{item.description ?? "—"}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{item.category}</p>
                   </li>
                 ))}
               </ul>
