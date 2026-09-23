@@ -15,7 +15,7 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "تسجيل الدخول — مِكلاف" },
-      { name: "description", content: "سجّل الدخول إلى منصة مِكلاف لإدارة المدرسة والإرشاد الطلابي." },
+      { name: "description", content: "سجّل الدخول إلى منصة مِكلاف لإدارة المدرسة والموجه الطلابي." },
       { property: "og:title", content: "تسجيل الدخول — مِكلاف" },
       { property: "og:description", content: "بوابة الدخول إلى منصة إدارة المدرسة مِكلاف." },
     ],

@@ -88,7 +88,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "منصة مدرسية عربية متكاملة لإدارة الطلاب والحضور والإرشاد الطلابي والمواعيد والخطة التشغيلية والتقارير.",
+          "منصة مدرسية عربية متكاملة لإدارة الطلاب والحضور والموجه الطلابي والمواعيد والخطة التشغيلية والتقارير.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -48,10 +48,10 @@ import {
 export const Route = createFileRoute("/_authenticated/counseling")({
   head: () => ({
     meta: [
-      { title: "الإرشاد الطلابي — مِكلاف" },
-      { name: "description", content: "إدارة حالات الإرشاد الطلابي والسلوك ومتابعتها بالملاحظات." },
-      { property: "og:title", content: "الإرشاد الطلابي — مِكلاف" },
-      { property: "og:description", content: "تتبع حالات الإرشاد من الفتح حتى الإغلاق." },
+      { title: "الموجه الطلابي — مِكلاف" },
+      { name: "description", content: "إدارة حالات الموجه الطلابي والسلوك ومتابعتها بالملاحظات." },
+      { property: "og:title", content: "الموجه الطلابي — مِكلاف" },
+      { property: "og:description", content: "تتبع حالات التوجيه من الفتح حتى الإغلاق." },
     ],
   }),
   component: CounselingPage,
@@ -157,9 +157,9 @@ function CounselingPage() {
   return (
     <div className="mx-auto w-full max-w-6xl">
       <PageHeader
-        title="الإرشاد الطلابي"
-        description="حالات الإرشاد والسلوك، حالتها، نسبة تقدمها وتواريخ المتابعة."
-        crumbs={[{ label: "لوحة المتابعة", to: "/dashboard" }, { label: "الإرشاد الطلابي" }]}
+        title="الموجه الطلابي"
+        description="حالات التوجيه والسلوك، حالتها، نسبة تقدمها وتواريخ المتابعة."
+        crumbs={[{ label: "لوحة المتابعة", to: "/dashboard" }, { label: "الموجه الطلابي" }]}
         action={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -169,7 +169,7 @@ function CounselingPage() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>إنشاء حالة إرشادية</DialogTitle>
+                <DialogTitle>إنشاء حالة توجيه</DialogTitle>
               </DialogHeader>
               <div className="space-y-3">
                 <div>
@@ -278,7 +278,7 @@ function CounselingPage() {
             <EmptyState
               icon={<HeartHandshake size={20} />}
               title="لا توجد حالات"
-              description="أنشئ حالة إرشادية جديدة لبدء المتابعة."
+              description="أنشئ حالة توجيه جديدة لبدء المتابعة."
             />
           ) : (
             <div className="space-y-3">

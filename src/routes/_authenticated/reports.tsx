@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
     meta: [
       { title: "التقارير — مِكلاف" },
-      { name: "description", content: "تقارير الحضور والحالات الإرشادية والخطة التشغيلية مع التصدير والطباعة." },
+      { name: "description", content: "تقارير الحضور وحالات الموجه الطلابي والخطة التشغيلية مع التصدير والطباعة." },
       { property: "og:title", content: "التقارير — مِكلاف" },
       { property: "og:description", content: "تقارير قابلة للتصفية والتصدير إلى Excel والطباعة." },
     ],
@@ -53,7 +53,7 @@ type ReportKey = "attendance" | "students" | "cases" | "tasks";
 const reportLabels: Record<ReportKey, string> = {
   attendance: "تقرير الحضور",
   students: "تقرير الطلاب",
-  cases: "تقرير الحالات الإرشادية",
+  cases: "تقرير حالات الموجه الطلابي",
   tasks: "تقرير الخطة التشغيلية",
 };
 
