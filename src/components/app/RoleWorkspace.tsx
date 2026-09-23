@@ -17,6 +17,7 @@ import { Panel, PageHeader, Bar, Chip, ErrorState, LoadingCards } from "@/compon
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { fetchAlthatPublicSummary, type AlthatPublicSummary } from "@/lib/althat";
 import type { AppRole } from "@/lib/labels";
 import { formatDate } from "@/lib/labels";
 
@@ -135,6 +136,8 @@ export function RoleWorkspace({ kind }: { kind: WorkspaceKey }) {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [althatSummary, setAlthatSummary] = useState<AlthatPublicSummary | null>(null);
+  const [althatError, setAlthatError] = useState<string | null>(null);
   const canAccess = roles.includes("administrator") || roles.includes(config.role);
 
   const loadSnapshot = async () => {
@@ -180,6 +183,18 @@ export function RoleWorkspace({ kind }: { kind: WorkspaceKey }) {
   useEffect(() => {
     void loadSnapshot();
   }, []);
+
+  useEffect(() => {
+    if (kind !== "counselor") return;
+    void fetchAlthatPublicSummary()
+      .then((summary) => {
+        setAlthatSummary(summary);
+        setAlthatError(null);
+      })
+      .catch((reason: unknown) => {
+        setAlthatError(reason instanceof Error ? reason.message : "تعذر الاتصال بمنصة الذات");
+      });
+  }, [kind]);
 
   const stats = useMemo(
     () => [
@@ -232,13 +247,80 @@ export function RoleWorkspace({ kind }: { kind: WorkspaceKey }) {
             <div className="mb-1 text-xs font-bold text-gold">تكامل البيانات</div>
             <h2 className="font-display text-lg font-black">{config.accent}</h2>
             <p className="mt-1 text-xs text-navy-foreground/70">
-              يتم عرض البيانات الحالية من مكلاف. المزامنة الثنائية مع منصة الذات تحتاج رابط API أو
-              موصل رسمي من المنصة.
+              تتم قراءة البيانات العامة من منصة الذات مباشرةً. لا يتم جلب الطلاب أو الحالات أو
+              الحضور أو السلوك أو المقابلات أو نصوص الرسائل الخاصة.
             </p>
           </div>
-          <Chip tone="gold">مزامنة داخلية فعالة</Chip>
+          <Chip tone={althatSummary ? "leaf" : "gold"}>
+            {althatSummary ? "متصل — بيانات عامة مباشرة" : "جارٍ فحص الاتصال"}
+          </Chip>
         </div>
       </Panel>
+
+      {kind === "counselor" && (
+        <Panel
+          className="mb-5"
+          title="بيانات الذات العامة"
+          description={
+            althatSummary
+              ? `آخر قراءة مباشرة: ${formatDate(althatSummary.syncedAt)}`
+              : "تُقرأ عند فتح الصفحة دون نسخ السجلات الخاصة إلى مكلاف."
+          }
+        >
+          {althatError ? (
+            <div className="rounded-xl border border-gold/40 bg-gold-soft px-4 py-3 text-sm text-accent-foreground">
+              تعذر قراءة البيانات العامة من منصة الذات حاليًا؛ ستستمر بيانات مكلاف بالعمل بشكل
+              طبيعي.
+            </div>
+          ) : !althatSummary ? (
+            <div className="text-sm text-muted-foreground">
+              جارٍ تحميل المؤشرات العامة من الذات...
+            </div>
+          ) : (
+            <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                <div className="rounded-xl bg-sea-soft p-4">
+                  <div className="text-xs text-muted-foreground">البرامج</div>
+                  <div className="mt-1 text-2xl font-black text-sea">{althatSummary.programs}</div>
+                </div>
+                <div className="rounded-xl bg-gold-soft p-4">
+                  <div className="text-xs text-muted-foreground">المهام العامة</div>
+                  <div className="mt-1 text-2xl font-black text-accent-foreground">
+                    {althatSummary.tasks.length}
+                  </div>
+                </div>
+                <div className="rounded-xl bg-rose-soft p-4">
+                  <div className="text-xs text-muted-foreground">رسائل جديدة — عدد فقط</div>
+                  <div className="mt-1 text-2xl font-black text-rose">
+                    {althatSummary.newFeedbackCount}
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {althatSummary.events.slice(0, 4).map((event) => (
+                  <div
+                    key={event.id}
+                    className="flex items-center gap-3 rounded-xl border border-border p-3 text-sm"
+                  >
+                    <CalendarCheck size={17} className="shrink-0 text-sea" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-bold">{event.title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {formatDate(event.date)} · {event.status ?? "غير محدد"}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {althatSummary.events.length === 0 && (
+                  <div className="rounded-xl border border-dashed border-border p-5 text-center text-sm text-muted-foreground">
+                    لا توجد فعاليات عامة منشورة حاليًا في الذات.
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </Panel>
+      )}
 
       {error ? (
         <ErrorState message={error} />
