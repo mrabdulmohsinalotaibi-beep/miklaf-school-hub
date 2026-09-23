@@ -255,6 +255,29 @@ function CounselingPage() {
         }
       />
 
+      <div className="mb-5 overflow-hidden rounded-2xl border border-border bg-gradient-to-l from-primary/10 to-transparent p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <ExternalLink size={18} className="text-primary" />
+              <h2 className="font-display text-base font-black">سجلات الموجه الطلابي — منصة الذات</h2>
+            </div>
+            <p className="mt-1 max-w-xl text-xs text-muted-foreground">
+              سجلات الموجه الطلابي الإلكترونية تُدار عبر منصة الذات، وتُفتح من هنا مباشرة.
+              {isAdmin
+                ? " بصفتك مديرًا لديك صلاحية الاطّلاع على جميع السجلات ومتابعتها."
+                : " تفتح السجلات بحسابك في منصة الذات، ويطّلع عليها مدير المدرسة."}
+            </p>
+          </div>
+          <a href="https://athat.app/" target="_blank" rel="noopener noreferrer">
+            <Button>
+              فتح سجلات الذات <ExternalLink size={16} />
+            </Button>
+          </a>
+        </div>
+      </div>
+
+
       <div className="mb-5 flex flex-wrap gap-2">
         {(["all", "new", "in_progress", "closed"] as const).map((key) => (
           <Button
