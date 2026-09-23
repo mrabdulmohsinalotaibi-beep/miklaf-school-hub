@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { HeartHandshake, Plus } from "lucide-react";
+import { ExternalLink, HeartHandshake, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -48,10 +48,10 @@ import {
 export const Route = createFileRoute("/_authenticated/counseling")({
   head: () => ({
     meta: [
-      { title: "الإرشاد الطلابي — مِكلاف" },
-      { name: "description", content: "إدارة حالات الإرشاد الطلابي والسلوك ومتابعتها بالملاحظات." },
-      { property: "og:title", content: "الإرشاد الطلابي — مِكلاف" },
-      { property: "og:description", content: "تتبع حالات الإرشاد من الفتح حتى الإغلاق." },
+      { title: "الموجه الطلابي — مِكلاف" },
+      { name: "description", content: "إدارة حالات الموجه الطلابي والسلوك ومتابعتها بالملاحظات." },
+      { property: "og:title", content: "الموجه الطلابي — مِكلاف" },
+      { property: "og:description", content: "تتبع حالات التوجيه من الفتح حتى الإغلاق." },
     ],
   }),
   component: CounselingPage,
@@ -73,7 +73,7 @@ const categories = ["سلوكي", "أكاديمي", "نفسي", "اجتماعي"
 
 function CounselingPage() {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [statusFilter, setStatusFilter] = useState<"all" | CaseStatus>("all");
   const [selected, setSelected] = useState<CaseRow | null>(null);
   const [open, setOpen] = useState(false);
@@ -157,9 +157,9 @@ function CounselingPage() {
   return (
     <div className="mx-auto w-full max-w-6xl">
       <PageHeader
-        title="الإرشاد الطلابي"
-        description="حالات الإرشاد والسلوك، حالتها، نسبة تقدمها وتواريخ المتابعة."
-        crumbs={[{ label: "لوحة المتابعة", to: "/dashboard" }, { label: "الإرشاد الطلابي" }]}
+        title="الموجه الطلابي"
+        description="حالات التوجيه والسلوك، حالتها، نسبة تقدمها وتواريخ المتابعة."
+        crumbs={[{ label: "لوحة المتابعة", to: "/dashboard" }, { label: "الموجه الطلابي" }]}
         action={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -169,7 +169,7 @@ function CounselingPage() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>إنشاء حالة إرشادية</DialogTitle>
+                <DialogTitle>إنشاء حالة توجيه</DialogTitle>
               </DialogHeader>
               <div className="space-y-3">
                 <div>
@@ -255,6 +255,29 @@ function CounselingPage() {
         }
       />
 
+      <div className="mb-5 overflow-hidden rounded-2xl border border-border bg-gradient-to-l from-primary/10 to-transparent p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <ExternalLink size={18} className="text-primary" />
+              <h2 className="font-display text-base font-black">سجلات الموجه الطلابي — منصة الذات</h2>
+            </div>
+            <p className="mt-1 max-w-xl text-xs text-muted-foreground">
+              سجلات الموجه الطلابي الإلكترونية تُدار عبر منصة الذات، وتُفتح من هنا مباشرة.
+              {isAdmin
+                ? " بصفتك مديرًا لديك صلاحية الاطّلاع على جميع السجلات ومتابعتها."
+                : " تفتح السجلات بحسابك في منصة الذات، ويطّلع عليها مدير المدرسة."}
+            </p>
+          </div>
+          <a href="https://athat.app/" target="_blank" rel="noopener noreferrer">
+            <Button>
+              فتح سجلات الذات <ExternalLink size={16} />
+            </Button>
+          </a>
+        </div>
+      </div>
+
+
       <div className="mb-5 flex flex-wrap gap-2">
         {(["all", "new", "in_progress", "closed"] as const).map((key) => (
           <Button
@@ -278,7 +301,7 @@ function CounselingPage() {
             <EmptyState
               icon={<HeartHandshake size={20} />}
               title="لا توجد حالات"
-              description="أنشئ حالة إرشادية جديدة لبدء المتابعة."
+              description="أنشئ حالة توجيه جديدة لبدء المتابعة."
             />
           ) : (
             <div className="space-y-3">

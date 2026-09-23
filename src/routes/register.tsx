@@ -22,7 +22,7 @@ export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
       { title: "إنشاء حساب — مِكلاف" },
-      { name: "description", content: "أنشئ حسابك في منصة مِكلاف لإدارة المدرسة والإرشاد الطلابي." },
+      { name: "description", content: "أنشئ حسابك في منصة مِكلاف لإدارة المدرسة والموجه الطلابي." },
       { property: "og:title", content: "إنشاء حساب — مِكلاف" },
       { property: "og:description", content: "انضم إلى منصة مِكلاف كمدير أو موجه طلابي أو معلم." },
     ],

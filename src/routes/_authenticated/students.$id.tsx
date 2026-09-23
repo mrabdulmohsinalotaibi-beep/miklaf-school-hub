@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/students/$id")({
       { title: "ملف الطالب — مِكلاف" },
       { name: "description", content: "الملف الأكاديمي والسلوكي وسجل الحضور للطالب." },
       { property: "og:title", content: "ملف الطالب — مِكلاف" },
-      { property: "og:description", content: "بيانات الطالب الأكاديمية والحضور والحالات الإرشادية." },
+      { property: "og:description", content: "بيانات الطالب الأكاديمية والحضور وحالات الموجه الطلابي." },
     ],
   }),
   component: StudentProfilePage,
@@ -78,7 +78,7 @@ function StudentProfilePage() {
         <TabsList>
           <TabsTrigger value="academic">الأكاديمي</TabsTrigger>
           <TabsTrigger value="attendance">الحضور</TabsTrigger>
-          <TabsTrigger value="behavior">السلوك والإرشاد</TabsTrigger>
+          <TabsTrigger value="behavior">السلوك والتوجيه</TabsTrigger>
         </TabsList>
 
         <TabsContent value="academic" className="mt-4">
@@ -116,7 +116,7 @@ function StudentProfilePage() {
         </TabsContent>
 
         <TabsContent value="behavior" className="mt-4">
-          <Panel title="الحالات الإرشادية">
+          <Panel title="حالات الموجه الطلابي">
             {(cases.data ?? []).length === 0 ? (
               <EmptyState title="لا توجد حالات مسجلة" />
             ) : (

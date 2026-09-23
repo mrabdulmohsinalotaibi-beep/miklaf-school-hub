@@ -36,7 +36,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 const quickActions = [
   { to: "/attendance", label: "رصد الحضور", hint: "تسجيل حضور اليوم", icon: ClipboardCheck, tone: "sea" as const },
-  { to: "/counseling", label: "حالة إرشادية", hint: "فتح حالة جديدة", icon: HeartHandshake, tone: "rose" as const },
+  { to: "/counseling", label: "حالة توجيه", hint: "فتح حالة جديدة", icon: HeartHandshake, tone: "rose" as const },
   { to: "/appointments", label: "حجز موعد", hint: "مقابلة أو لقاء", icon: CalendarClock, tone: "gold" as const },
   { to: "/messages", label: "تعميم جديد", hint: "إعلان للمنسوبين", icon: Megaphone, tone: "leaf" as const },
 ];
@@ -174,7 +174,7 @@ function DashboardPage() {
       </div>
 
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <Panel title="الحالات الإرشادية النشطة">
+        <Panel title="حالات الموجه الطلابي النشطة">
           {openCases.length === 0 ? (
             <EmptyState title="لا توجد حالات مفتوحة" />
           ) : (

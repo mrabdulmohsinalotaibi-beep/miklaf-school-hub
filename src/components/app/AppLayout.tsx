@@ -51,7 +51,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     items: [
       { to: "/students", label: "سجل الطلاب", icon: Users },
       { to: "/attendance", label: "الحضور والغياب", icon: ClipboardList },
-      { to: "/counseling", label: "الإرشاد الطلابي", icon: HeartHandshake },
+      { to: "/counseling", label: "الموجه الطلابي", icon: HeartHandshake },
       { to: "/appointments", label: "المواعيد والمقابلات", icon: CalendarClock },
     ],
   },

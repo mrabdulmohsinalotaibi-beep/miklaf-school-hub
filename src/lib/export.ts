@@ -76,7 +76,7 @@ export function printReport(
       .map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`)
       .join("")}</tbody></table>
     <div class="signs">
-      <div class="sign">المرشد الطلابي<div class="line">الاسم / التوقيع</div></div>
+      <div class="sign">الموجه الطلابي<div class="line">الاسم / التوقيع</div></div>
       <div class="sign">وكيل شؤون الطلاب<div class="line">الاسم / التوقيع</div></div>
       <div class="sign">مدير المدرسة<div class="line">الاسم / التوقيع</div><div class="seal">ختم المدرسة</div></div>
     </div>
