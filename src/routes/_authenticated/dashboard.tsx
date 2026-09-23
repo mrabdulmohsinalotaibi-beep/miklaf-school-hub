@@ -83,8 +83,28 @@ function DashboardPage() {
         crumbs={[{ label: "الرئيسية" }, { label: "لوحة المتابعة" }]}
       />
 
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {quickActions.map((action) => (
+          <Link
+            key={action.to}
+            to={action.to}
+            className="panel group flex items-center gap-3 p-4 transition hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            <Chip tone={action.tone}>
+              <action.icon size={14} />
+            </Chip>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-bold">{action.label}</div>
+              <div className="truncate text-xs text-muted-foreground">{action.hint}</div>
+            </div>
+            <ArrowLeft size={16} className="ms-auto shrink-0 text-muted-foreground transition group-hover:-translate-x-1" />
+          </Link>
+        ))}
+      </div>
+
       {loading ? (
         <LoadingCards />
+
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {kpis.map((kpi) => (
