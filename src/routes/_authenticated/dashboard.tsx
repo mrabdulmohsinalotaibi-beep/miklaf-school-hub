@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarClock, HeartHandshake, TrendingUp, Users } from "lucide-react";
+import { ArrowLeft, CalendarClock, ClipboardCheck, HeartHandshake, Megaphone, TrendingUp, Users } from "lucide-react";
+
 import {
   Area,
   AreaChart,
@@ -33,7 +34,15 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
+const quickActions = [
+  { to: "/attendance", label: "رصد الحضور", hint: "تسجيل حضور اليوم", icon: ClipboardCheck, tone: "sea" as const },
+  { to: "/counseling", label: "حالة إرشادية", hint: "فتح حالة جديدة", icon: HeartHandshake, tone: "rose" as const },
+  { to: "/appointments", label: "حجز موعد", hint: "مقابلة أو لقاء", icon: CalendarClock, tone: "gold" as const },
+  { to: "/messages", label: "تعميم جديد", hint: "إعلان للمنسوبين", icon: Megaphone, tone: "leaf" as const },
+];
+
 function DashboardPage() {
+
   const from = isoDate(new Date(Date.now() - 13 * 86400000));
   const students = useQuery({ queryKey: qk.students, queryFn: api.students });
   const attendance = useQuery({ queryKey: ["attendance", "range", from], queryFn: () => api.attendanceRange(from) });
