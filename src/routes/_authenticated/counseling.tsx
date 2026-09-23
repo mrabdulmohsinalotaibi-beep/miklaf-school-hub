@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { HeartHandshake, Plus } from "lucide-react";
+import { ExternalLink, HeartHandshake, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -73,7 +73,7 @@ const categories = ["سلوكي", "أكاديمي", "نفسي", "اجتماعي"
 
 function CounselingPage() {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [statusFilter, setStatusFilter] = useState<"all" | CaseStatus>("all");
   const [selected, setSelected] = useState<CaseRow | null>(null);
   const [open, setOpen] = useState(false);
