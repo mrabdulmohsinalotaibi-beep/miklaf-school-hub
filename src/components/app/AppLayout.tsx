@@ -18,6 +18,9 @@ import {
   UserRound,
   Users,
   HeartHandshake,
+  BookOpenCheck,
+  Building2,
+  UserCog,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -52,6 +55,8 @@ const navGroups: { title: string; items: NavItem[] }[] = [
       { to: "/students", label: "سجل الطلاب", icon: Users },
       { to: "/attendance", label: "الحضور والغياب", icon: ClipboardList },
       { to: "/counseling", label: "الموجه الطلابي", icon: HeartHandshake },
+      { to: "/counselor", label: "مساحة الموجه", icon: HeartHandshake },
+      { to: "/teacher", label: "مساحة المعلم", icon: BookOpenCheck },
       { to: "/appointments", label: "المواعيد والمقابلات", icon: CalendarClock },
     ],
   },
@@ -60,6 +65,9 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     items: [
       { to: "/messages", label: "الرسائل والإعلانات", icon: MessagesSquare },
       { to: "/plan", label: "الخطة التشغيلية", icon: ClipboardList },
+      { to: "/educational-deputy", label: "وكيل الشؤون التعليمية", icon: BookOpenCheck },
+      { to: "/school-deputy", label: "وكيل الشؤون المدرسية", icon: Building2 },
+      { to: "/student-affairs-deputy", label: "وكيل شؤون الطلاب", icon: UserCog },
       { to: "/users", label: "إدارة المستخدمين", icon: ShieldCheck, adminOnly: true },
       { to: "/settings", label: "الإعدادات", icon: Settings },
     ],
@@ -187,7 +195,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </SheetTrigger>
               <SheetContent side="right" className="w-[272px] bg-sidebar p-0">
                 <SheetTitle className="sr-only">القائمة الرئيسية</SheetTitle>
-                <SidebarContent collapsed={false} isAdmin={isAdmin} onNavigate={() => setMobileOpen(false)} />
+                <SidebarContent
+                  collapsed={false}
+                  isAdmin={isAdmin}
+                  onNavigate={() => setMobileOpen(false)}
+                />
               </SheetContent>
             </Sheet>
 
@@ -233,7 +245,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   <Settings size={15} /> الإعدادات
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive" onSelect={() => void handleSignOut()}>
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onSelect={() => void handleSignOut()}
+                >
                   <LogOut size={15} /> تسجيل الخروج
                 </DropdownMenuItem>
               </DropdownMenuContent>

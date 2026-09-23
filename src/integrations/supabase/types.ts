@@ -443,7 +443,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      app_role: "administrator" | "counselor" | "teacher"
+      app_role:
+        | "administrator"
+        | "counselor"
+        | "teacher"
+        | "educational_deputy"
+        | "school_deputy"
+        | "student_affairs_deputy"
       attendance_status: "present" | "absent" | "late" | "excused"
       case_priority: "low" | "medium" | "high"
       case_status: "new" | "in_progress" | "closed"

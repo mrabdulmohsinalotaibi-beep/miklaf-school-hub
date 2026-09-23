@@ -10,6 +10,9 @@ export const roleLabels: Record<AppRole, string> = {
   administrator: "مدير المدرسة",
   counselor: "موجه طلابي",
   teacher: "معلم",
+  educational_deputy: "وكيل الشؤون التعليمية",
+  school_deputy: "وكيل الشؤون المدرسية",
+  student_affairs_deputy: "وكيل شؤون الطلاب",
 };
 
 export const attendanceLabels: Record<AttendanceStatus, string> = {
@@ -82,10 +85,12 @@ export function isoDate(date = new Date()) {
 export function authErrorMessage(message: string) {
   const text = message.toLowerCase();
   if (text.includes("invalid login")) return "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
-  if (text.includes("email not confirmed")) return "يرجى تأكيد بريدك الإلكتروني أولًا عبر الرسالة المرسلة إليك.";
+  if (text.includes("email not confirmed"))
+    return "يرجى تأكيد بريدك الإلكتروني أولًا عبر الرسالة المرسلة إليك.";
   if (text.includes("already registered") || text.includes("already been registered"))
     return "هذا البريد الإلكتروني مسجل مسبقًا.";
-  if (text.includes("password should be")) return "كلمة المرور قصيرة جدًا، استخدم 8 أحرف على الأقل.";
+  if (text.includes("password should be"))
+    return "كلمة المرور قصيرة جدًا، استخدم 8 أحرف على الأقل.";
   if (text.includes("rate limit") || text.includes("too many"))
     return "تم إرسال عدد كبير من الطلبات، يرجى المحاولة بعد قليل.";
   if (text.includes("network")) return "تعذّر الاتصال بالخادم، تحقق من اتصالك بالإنترنت.";
