@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ExternalLink, HeartHandshake, Plus } from "lucide-react";
+import { HeartHandshake, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -73,7 +73,7 @@ const categories = ["سلوكي", "أكاديمي", "نفسي", "اجتماعي"
 
 function CounselingPage() {
   const queryClient = useQueryClient();
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<"all" | CaseStatus>("all");
   const [selected, setSelected] = useState<CaseRow | null>(null);
   const [open, setOpen] = useState(false);
@@ -120,7 +120,13 @@ function CounselingPage() {
     onSuccess: () => {
       toast.success("تم إنشاء الحالة.");
       setOpen(false);
-      setForm({ title: "", category: "سلوكي", student_id: "", priority: "medium", follow_up_date: "" });
+      setForm({
+        title: "",
+        category: "سلوكي",
+        student_id: "",
+        priority: "medium",
+        follow_up_date: "",
+      });
       void queryClient.invalidateQueries({ queryKey: qk.cases });
     },
     onError: (error: Error) => toast.error(error.message),
@@ -203,7 +209,9 @@ function CounselingPage() {
                     <Label>الأولوية</Label>
                     <Select
                       value={form.priority}
-                      onValueChange={(value) => setForm({ ...form, priority: value as CasePriority })}
+                      onValueChange={(value) =>
+                        setForm({ ...form, priority: value as CasePriority })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -255,29 +263,6 @@ function CounselingPage() {
         }
       />
 
-      <div className="mb-5 overflow-hidden rounded-2xl border border-border bg-gradient-to-l from-primary/10 to-transparent p-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <ExternalLink size={18} className="text-primary" />
-              <h2 className="font-display text-base font-black">سجلات الموجه الطلابي — منصة الذات</h2>
-            </div>
-            <p className="mt-1 max-w-xl text-xs text-muted-foreground">
-              سجلات الموجه الطلابي الإلكترونية تُدار عبر منصة الذات، وتُفتح من هنا مباشرة.
-              {isAdmin
-                ? " بصفتك مديرًا لديك صلاحية الاطّلاع على جميع السجلات ومتابعتها."
-                : " تفتح السجلات بحسابك في منصة الذات، ويطّلع عليها مدير المدرسة."}
-            </p>
-          </div>
-          <a href="https://athat.app/" target="_blank" rel="noopener noreferrer">
-            <Button>
-              فتح سجلات الذات <ExternalLink size={16} />
-            </Button>
-          </a>
-        </div>
-      </div>
-
-
       <div className="mb-5 flex flex-wrap gap-2">
         {(["all", "new", "in_progress", "closed"] as const).map((key) => (
           <Button
@@ -314,17 +299,21 @@ function CounselingPage() {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-display text-sm font-black">{item.title}</span>
                     <div className="flex gap-2">
-                      <Chip tone={priorityTone[item.priority]}>{casePriorityLabels[item.priority]}</Chip>
+                      <Chip tone={priorityTone[item.priority]}>
+                        {casePriorityLabels[item.priority]}
+                      </Chip>
                       <Chip tone={statusTone[item.status]}>{caseStatusLabels[item.status]}</Chip>
                     </div>
                   </div>
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {item.student_id ? studentNames.get(item.student_id) ?? "—" : "بدون طالب"} ·{" "}
+                    {item.student_id ? (studentNames.get(item.student_id) ?? "—") : "بدون طالب"} ·{" "}
                     {item.category} · متابعة {formatDate(item.follow_up_date)}
                   </div>
                   <div className="mt-3 flex items-center gap-3">
                     <Bar value={item.progress} tone={statusTone[item.status]} />
-                    <span className="text-xs font-bold text-muted-foreground">{item.progress}%</span>
+                    <span className="text-xs font-bold text-muted-foreground">
+                      {item.progress}%
+                    </span>
                   </div>
                 </button>
               ))}
@@ -334,7 +323,10 @@ function CounselingPage() {
 
         <Panel title={selected ? selected.title : "تفاصيل الحالة"}>
           {!selected ? (
-            <EmptyState title="اختر حالة" description="اضغط على أي حالة لعرض ملاحظاتها وتحديث حالتها." />
+            <EmptyState
+              title="اختر حالة"
+              description="اضغط على أي حالة لعرض ملاحظاتها وتحديث حالتها."
+            />
           ) : (
             <div className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
@@ -344,7 +336,10 @@ function CounselingPage() {
                     value={selected.status}
                     onValueChange={(value) => {
                       setSelected({ ...selected, status: value as CaseStatus });
-                      updateCase.mutate({ id: selected.id, patch: { status: value as CaseStatus } });
+                      updateCase.mutate({
+                        id: selected.id,
+                        patch: { status: value as CaseStatus },
+                      });
                     }}
                   >
                     <SelectTrigger>
@@ -384,7 +379,10 @@ function CounselingPage() {
                   onChange={(event) => {
                     const value = event.target.value;
                     setSelected({ ...selected, follow_up_date: value });
-                    updateCase.mutate({ id: selected.id, patch: { follow_up_date: value || null } });
+                    updateCase.mutate({
+                      id: selected.id,
+                      patch: { follow_up_date: value || null },
+                    });
                   }}
                 />
               </div>
