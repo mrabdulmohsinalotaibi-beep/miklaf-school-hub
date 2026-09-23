@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarClock, HeartHandshake, TrendingUp, Users } from "lucide-react";
+import { ArrowLeft, CalendarClock, ClipboardCheck, HeartHandshake, Megaphone, TrendingUp, Users } from "lucide-react";
+
 import {
   Area,
   AreaChart,
@@ -33,7 +34,15 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
+const quickActions = [
+  { to: "/attendance", label: "رصد الحضور", hint: "تسجيل حضور اليوم", icon: ClipboardCheck, tone: "sea" as const },
+  { to: "/counseling", label: "حالة إرشادية", hint: "فتح حالة جديدة", icon: HeartHandshake, tone: "rose" as const },
+  { to: "/appointments", label: "حجز موعد", hint: "مقابلة أو لقاء", icon: CalendarClock, tone: "gold" as const },
+  { to: "/messages", label: "تعميم جديد", hint: "إعلان للمنسوبين", icon: Megaphone, tone: "leaf" as const },
+];
+
 function DashboardPage() {
+
   const from = isoDate(new Date(Date.now() - 13 * 86400000));
   const students = useQuery({ queryKey: qk.students, queryFn: api.students });
   const attendance = useQuery({ queryKey: ["attendance", "range", from], queryFn: () => api.attendanceRange(from) });
@@ -83,8 +92,28 @@ function DashboardPage() {
         crumbs={[{ label: "الرئيسية" }, { label: "لوحة المتابعة" }]}
       />
 
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {quickActions.map((action) => (
+          <Link
+            key={action.to}
+            to={action.to}
+            className="panel group flex items-center gap-3 p-4 transition hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            <Chip tone={action.tone}>
+              <action.icon size={14} />
+            </Chip>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-bold">{action.label}</div>
+              <div className="truncate text-xs text-muted-foreground">{action.hint}</div>
+            </div>
+            <ArrowLeft size={16} className="ms-auto shrink-0 text-muted-foreground transition group-hover:-translate-x-1" />
+          </Link>
+        ))}
+      </div>
+
       {loading ? (
         <LoadingCards />
+
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {kpis.map((kpi) => (
