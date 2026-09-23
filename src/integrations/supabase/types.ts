@@ -367,6 +367,7 @@ export type Database = {
           guardian_phone: string | null
           id: string
           is_demo: boolean
+          nationality: string | null
           notes: string | null
           status: string
           student_no: string
@@ -383,6 +384,7 @@ export type Database = {
           guardian_phone?: string | null
           id?: string
           is_demo?: boolean
+          nationality?: string | null
           notes?: string | null
           status?: string
           student_no: string
@@ -399,6 +401,7 @@ export type Database = {
           guardian_phone?: string | null
           id?: string
           is_demo?: boolean
+          nationality?: string | null
           notes?: string | null
           status?: string
           student_no?: string

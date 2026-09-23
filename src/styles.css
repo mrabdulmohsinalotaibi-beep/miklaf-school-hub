@@ -95,8 +95,9 @@
   --rose-soft: oklch(0.938 0.02 14);
   --sea: oklch(0.51 0.095 178);
   --sea-soft: oklch(0.94 0.035 178);
-  --leaf: oklch(0.265 0.037 246);
-  --leaf-soft: oklch(0.93 0.018 246);
+  /* Brand palette: navy, sea, gold, and rose. Leaf is a semantic alias of sea. */
+  --leaf: oklch(0.51 0.095 178);
+  --leaf-soft: oklch(0.94 0.035 178);
 
   --chart-1: oklch(0.567 0.089 15);
   --chart-2: oklch(0.51 0.095 178);
