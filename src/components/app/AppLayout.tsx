@@ -1,26 +1,32 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  CalendarClock,
+  BadgeCheck,
+  Bell,
+  Building2,
   ClipboardList,
   FileBarChart,
+  Files,
+  GitBranch,
   GraduationCap,
+  History,
+  Inbox,
+  KeyRound,
+  Layers3,
   LayoutDashboard,
   LogOut,
   Menu,
-  MessagesSquare,
   Moon,
+  Paperclip,
   PanelLeftClose,
   PanelLeftOpen,
+  RefreshCw,
+  Send,
   Settings,
-  ShieldCheck,
   Sun,
+  UserPlus,
   UserRound,
   Users,
-  HeartHandshake,
-  BookOpenCheck,
-  Building2,
-  UserCog,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -43,42 +49,41 @@ type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; adminO
 
 const navGroups: { title: string; items: NavItem[] }[] = [
   {
-    title: "نظرة عامة",
-    items: [
-      { to: "/dashboard", label: "لوحة المتابعة", icon: LayoutDashboard },
-      { to: "/reports", label: "التقارير", icon: FileBarChart },
-    ],
-  },
-  {
     title: "المدرسة",
     items: [
-      { to: "/school", label: "مساحة المدرسة", icon: Building2 },
-      { to: "/operations", label: "مركز الأعمال", icon: ClipboardList },
-      { to: "/inbox", label: "الوارد والصادر", icon: MessagesSquare },
+      { to: "/dashboard", label: "لوحة قيادة المدرسة", icon: LayoutDashboard },
+      { to: "/school", label: "بيانات المدرسة", icon: Building2 },
     ],
   },
   {
-    title: "المجتمع المدرسي",
+    title: "الإدارة",
     items: [
-      { to: "/students", label: "سجل الطلاب", icon: Users },
-      { to: "/attendance", label: "الحضور والغياب", icon: ClipboardList },
-      { to: "/counseling", label: "الموجه الطلابي", icon: HeartHandshake },
-      { to: "/counselor", label: "مساحة الموجه", icon: HeartHandshake },
-      { to: "/teacher", label: "مساحة المعلم", icon: BookOpenCheck },
-      { to: "/appointments", label: "المواعيد والمقابلات", icon: CalendarClock },
+      { to: "/school", label: "الهيكل التنظيمي", icon: GitBranch },
+      { to: "/school", label: "أعضاء المدرسة", icon: Users },
+      { to: "/school", label: "الصلاحيات", icon: KeyRound },
+      { to: "/school", label: "طلبات الانضمام", icon: UserPlus },
     ],
   },
   {
-    title: "التشغيل والتوثيق",
+    title: "سير الأعمال",
     items: [
-      { to: "/messages", label: "الرسائل والإعلانات", icon: MessagesSquare },
-      { to: "/plan", label: "الخطة التشغيلية", icon: ClipboardList },
-      { to: "/operations", label: "الجداول والمساءلات والتعهدات", icon: ClipboardList },
-      { to: "/educational-deputy", label: "وكيل الشؤون التعليمية", icon: BookOpenCheck },
-      { to: "/school-deputy", label: "وكيل الشؤون المدرسية", icon: Building2 },
-      { to: "/student-affairs-deputy", label: "وكيل شؤون الطلاب", icon: UserCog },
-      { to: "/users", label: "إدارة المستخدمين", icon: ShieldCheck, adminOnly: true },
-      { to: "/settings", label: "الإعدادات", icon: Settings },
+      { to: "/inbox", label: "الوارد", icon: Inbox },
+      { to: "/inbox", label: "الصادر", icon: Send },
+      { to: "/plan", label: "إسناد الأعمال", icon: ClipboardList },
+      { to: "/plan", label: "المهام المتكررة", icon: RefreshCw },
+      { to: "/operations", label: "البرامج", icon: Layers3 },
+      { to: "/students", label: "السجلات", icon: Files },
+      { to: "/reports", label: "التقارير", icon: FileBarChart },
+      { to: "/operations", label: "الشواهد", icon: Paperclip },
+      { to: "/inbox", label: "الاعتمادات", icon: BadgeCheck },
+    ],
+  },
+  {
+    title: "النظام",
+    items: [
+      { to: "/inbox", label: "الإشعارات", icon: Bell },
+      { to: "/school", label: "سجل العمليات", icon: History },
+      { to: "/settings", label: "إعدادات الربط", icon: Settings },
     ],
   },
 ];
