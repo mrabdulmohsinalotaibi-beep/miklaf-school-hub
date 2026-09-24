@@ -58,10 +58,10 @@ const navGroups: { title: string; items: NavItem[] }[] = [
   {
     title: "الإدارة",
     items: [
-      { to: "/school", label: "الهيكل التنظيمي", icon: GitBranch },
-      { to: "/school", label: "أعضاء المدرسة", icon: Users },
-      { to: "/school", label: "الصلاحيات", icon: KeyRound },
-      { to: "/school", label: "طلبات الانضمام", icon: UserPlus },
+      { to: "/school?section=tree", label: "الهيكل التنظيمي", icon: GitBranch },
+      { to: "/school?section=members", label: "أعضاء المدرسة", icon: Users },
+      { to: "/school?section=permissions", label: "الصلاحيات", icon: KeyRound },
+      { to: "/school?section=requests", label: "طلبات الانضمام", icon: UserPlus },
     ],
   },
   {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -56,6 +56,10 @@ function SchoolWorkspacePage() {
   const { user, isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const [section, setSection] = useState<Section>("overview");
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("section") as Section | null;
+    if (requested && sections.some((item) => item.key === requested)) setSection(requested);
+  }, []);
   const [form, setForm] = useState({
     name: "",
     stage: "",
