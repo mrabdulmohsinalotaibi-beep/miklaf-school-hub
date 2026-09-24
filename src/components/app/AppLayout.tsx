@@ -65,6 +65,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     items: [
       { to: "/messages", label: "الرسائل والإعلانات", icon: MessagesSquare },
       { to: "/plan", label: "الخطة التشغيلية", icon: ClipboardList },
+      { to: "/operations", label: "الجداول والمساءلات والتعهدات", icon: ClipboardList },
       { to: "/educational-deputy", label: "وكيل الشؤون التعليمية", icon: BookOpenCheck },
       { to: "/school-deputy", label: "وكيل الشؤون المدرسية", icon: Building2 },
       { to: "/student-affairs-deputy", label: "وكيل شؤون الطلاب", icon: UserCog },

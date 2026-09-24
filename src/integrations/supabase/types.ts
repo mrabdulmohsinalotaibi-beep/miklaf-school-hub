@@ -439,6 +439,30 @@ export type Database = {
         Relationships: []
       }
     }
+      school_schedules: {
+        Row: { id: string; title: string; schedule_type: string; schedule_date: string | null; details: string | null; status: string; created_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; title: string; schedule_type?: string; schedule_date?: string | null; details?: string | null; status?: string; created_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; title?: string; schedule_type?: string; schedule_date?: string | null; details?: string | null; status?: string; created_by?: string | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      student_accountability: {
+        Row: { id: string; student_id: string | null; title: string; category: string; details: string | null; status: string; due_date: string | null; created_by: string | null; created_at: string }
+        Insert: { id?: string; student_id?: string | null; title: string; category?: string; details?: string | null; status?: string; due_date?: string | null; created_by?: string | null; created_at?: string }
+        Update: { id?: string; student_id?: string | null; title?: string; category?: string; details?: string | null; status?: string; due_date?: string | null; created_by?: string | null; created_at?: string }
+        Relationships: []
+      }
+      circulars: {
+        Row: { id: string; title: string; body: string | null; audience: string; issued_date: string; status: string; created_by: string | null; created_at: string }
+        Insert: { id?: string; title: string; body?: string | null; audience?: string; issued_date?: string; status?: string; created_by?: string | null; created_at?: string }
+        Update: { id?: string; title?: string; body?: string | null; audience?: string; issued_date?: string; status?: string; created_by?: string | null; created_at?: string }
+        Relationships: []
+      }
+      student_pledges: {
+        Row: { id: string; student_id: string | null; title: string; pledge_type: string; pledge_date: string; status: string; notes: string | null; created_by: string | null; created_at: string }
+        Insert: { id?: string; student_id?: string | null; title: string; pledge_type?: string; pledge_date?: string; status?: string; notes?: string | null; created_by?: string | null; created_at?: string }
+        Update: { id?: string; student_id?: string | null; title?: string; pledge_type?: string; pledge_date?: string; status?: string; notes?: string | null; created_by?: string | null; created_at?: string }
+        Relationships: []
+      }
     Views: {
       [_ in never]: never
     }

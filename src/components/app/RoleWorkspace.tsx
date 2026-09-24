@@ -81,6 +81,7 @@ const configs: Record<WorkspaceKey, WorkspaceConfig> = {
     links: [
       { label: "التقارير الأكاديمية", to: "/reports", icon: FileBarChart },
       { label: "الخطة التشغيلية", to: "/plan", icon: BookOpenCheck },
+      { label: "الجداول والتعاميم", to: "/operations", icon: CalendarCheck },
       { label: "سجل الطلاب", to: "/students", icon: Users },
     ],
   },
@@ -98,6 +99,7 @@ const configs: Record<WorkspaceKey, WorkspaceConfig> = {
     links: [
       { label: "الحضور والغياب", to: "/attendance", icon: ClipboardCheck },
       { label: "الخطة التشغيلية", to: "/plan", icon: BookOpenCheck },
+      { label: "الجداول والمساءلات", to: "/operations", icon: ClipboardCheck },
       { label: "الرسائل والإعلانات", to: "/messages", icon: Activity },
     ],
   },
@@ -115,6 +117,7 @@ const configs: Record<WorkspaceKey, WorkspaceConfig> = {
     links: [
       { label: "الموجه الطلابي", to: "/counseling", icon: HeartHandshake },
       { label: "الحضور والغياب", to: "/attendance", icon: ClipboardCheck },
+      { label: "التعهدات والمساءلات", to: "/operations", icon: ClipboardCheck },
       { label: "المواعيد والمقابلات", to: "/appointments", icon: CalendarCheck },
     ],
   },

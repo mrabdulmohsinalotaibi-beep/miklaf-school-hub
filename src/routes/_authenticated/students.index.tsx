@@ -103,16 +103,6 @@ const emptyForm: FormState = {
   nationality: "",
 };
 
-const excelHeaders = [
-  "اسم الطالب",
-  "رقم الهوية / السجل المدني",
-  "الجنسية",
-  "الصف الدراسي",
-  "الفصل",
-  "اسم ولي الأمر",
-  "رقم جوال ولي الأمر",
-] as const;
-
 function StudentsPage() {
   const queryClient = useQueryClient();
   const students = useQuery({ queryKey: qk.students, queryFn: api.students });
@@ -203,18 +193,24 @@ function StudentsPage() {
       if (!sheet) throw new Error("الملف لا يحتوي على ورقة عمل.");
       const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
       if (rows.length === 0) throw new Error("لا توجد بيانات بعد صف العناوين.");
-      const missing = excelHeaders.filter(
-        (header) => !Object.prototype.hasOwnProperty.call(rows[0], header),
-      );
-      if (missing.length) throw new Error(`الأعمدة الناقصة: ${missing.join("، ")}`);
+      // Missing columns are treated as blank values so the available data is still imported.
       const classRows = classes.data ?? [];
-      const parsed = rows.map((row) => {
+      const usedNumbers = new Set((students.data ?? []).map((student) => student.student_no));
+      const parsed = rows.map((row, index) => {
         const text = (key: string) => String(row[key] ?? "").trim();
         const className = text("الفصل");
         const matchedClass = classRows.find((item) => item.name.trim() === className);
-        const fullName = text("اسم الطالب");
-        const studentNo = text("رقم الهوية / السجل المدني");
-        const issue = !fullName ? "اسم الطالب مفقود" : !studentNo ? "رقم الهوية مفقود" : undefined;
+        const originalName = text("اسم الطالب");
+        const originalNumber = text("رقم الهوية / السجل المدني");
+        let studentNo = originalNumber || `IMPORT-${Date.now()}-${index + 1}`;
+        while (usedNumbers.has(studentNo)) studentNo = `${studentNo}-${index + 1}`;
+        usedNumbers.add(studentNo);
+        const fullName = originalName || `غير محدد — ${studentNo}`;
+        const warnings = [
+          !originalName ? "الاسم ناقص" : "",
+          !originalNumber ? "رقم الهوية ناقص وتم إنشاء رقم مؤقت" : "",
+          className && !matchedClass ? "الفصل غير موجود" : "",
+        ].filter(Boolean);
         return {
           full_name: fullName,
           student_no: studentNo,
@@ -224,10 +220,8 @@ function StudentsPage() {
           guardian_name: text("اسم ولي الأمر"),
           guardian_phone: text("رقم جوال ولي الأمر"),
           class_id: matchedClass?.id ?? null,
-          valid: !issue,
-          issue:
-            issue ??
-            (className && !matchedClass ? "الفصل غير موجود وسيُحفظ بدون ربط فصل" : undefined),
+          valid: true,
+          issue: warnings.join("، ") || undefined,
         } satisfies ImportRow;
       });
       setImportRows(parsed);

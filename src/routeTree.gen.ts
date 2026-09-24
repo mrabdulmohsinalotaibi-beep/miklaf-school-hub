@@ -22,6 +22,7 @@ import { Route as AuthenticatedCounselorRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEducationalDeputyRouteImport } from './routes/_authenticated/educational-deputy'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
+import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated/operations'
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedSchoolDeputyRouteImport } from './routes/_authenticated/school-deputy'
@@ -98,6 +99,11 @@ const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOperationsRoute = AuthenticatedOperationsRouteImport.update({
+  id: '/operations',
+  path: '/operations',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPlanRoute = AuthenticatedPlanRouteImport.update({
   id: '/plan',
   path: '/plan',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/educational-deputy': typeof AuthenticatedEducationalDeputyRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/operations': typeof AuthenticatedOperationsRoute
   '/plan': typeof AuthenticatedPlanRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/school-deputy': typeof AuthenticatedSchoolDeputyRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/educational-deputy': typeof AuthenticatedEducationalDeputyRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/operations': typeof AuthenticatedOperationsRoute
   '/plan': typeof AuthenticatedPlanRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/school-deputy': typeof AuthenticatedSchoolDeputyRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/educational-deputy': typeof AuthenticatedEducationalDeputyRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
+  '/_authenticated/operations': typeof AuthenticatedOperationsRoute
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/school-deputy': typeof AuthenticatedSchoolDeputyRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/educational-deputy'
     | '/messages'
+    | '/operations'
     | '/plan'
     | '/reports'
     | '/school-deputy'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/educational-deputy'
     | '/messages'
+    | '/operations'
     | '/plan'
     | '/reports'
     | '/school-deputy'
@@ -280,6 +291,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/educational-deputy'
     | '/_authenticated/messages'
+    | '/_authenticated/operations'
     | '/_authenticated/plan'
     | '/_authenticated/reports'
     | '/_authenticated/school-deputy'
@@ -393,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/operations': {
+      id: '/_authenticated/operations'
+      path: '/operations'
+      fullPath: '/operations'
+      preLoaderRoute: typeof AuthenticatedOperationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/plan': {
       id: '/_authenticated/plan'
       path: '/plan'
@@ -467,6 +486,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEducationalDeputyRoute: typeof AuthenticatedEducationalDeputyRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSchoolDeputyRoute: typeof AuthenticatedSchoolDeputyRoute
@@ -486,6 +506,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEducationalDeputyRoute: AuthenticatedEducationalDeputyRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSchoolDeputyRoute: AuthenticatedSchoolDeputyRoute,
