@@ -21,10 +21,12 @@ import { Route as AuthenticatedCounselingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedCounselorRouteImport } from './routes/_authenticated/counselor'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEducationalDeputyRouteImport } from './routes/_authenticated/educational-deputy'
+import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated/operations'
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedSchoolRouteImport } from './routes/_authenticated/school'
 import { Route as AuthenticatedSchoolDeputyRouteImport } from './routes/_authenticated/school-deputy'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedStudentAffairsDeputyRouteImport } from './routes/_authenticated/student-affairs-deputy'
@@ -94,6 +96,11 @@ const AuthenticatedEducationalDeputyRoute =
     path: '/educational-deputy',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
@@ -112,6 +119,11 @@ const AuthenticatedPlanRoute = AuthenticatedPlanRouteImport.update({
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSchoolRoute = AuthenticatedSchoolRouteImport.update({
+  id: '/school',
+  path: '/school',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSchoolDeputyRoute =
@@ -165,10 +177,12 @@ export interface FileRoutesByFullPath {
   '/counselor': typeof AuthenticatedCounselorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/educational-deputy': typeof AuthenticatedEducationalDeputyRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/plan': typeof AuthenticatedPlanRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/school': typeof AuthenticatedSchoolRoute
   '/school-deputy': typeof AuthenticatedSchoolDeputyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/student-affairs-deputy': typeof AuthenticatedStudentAffairsDeputyRoute
@@ -189,10 +203,12 @@ export interface FileRoutesByTo {
   '/counselor': typeof AuthenticatedCounselorRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/educational-deputy': typeof AuthenticatedEducationalDeputyRoute
+  '/inbox': typeof AuthenticatedInboxRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/plan': typeof AuthenticatedPlanRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/school': typeof AuthenticatedSchoolRoute
   '/school-deputy': typeof AuthenticatedSchoolDeputyRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/student-affairs-deputy': typeof AuthenticatedStudentAffairsDeputyRoute
@@ -215,10 +231,12 @@ export interface FileRoutesById {
   '/_authenticated/counselor': typeof AuthenticatedCounselorRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/educational-deputy': typeof AuthenticatedEducationalDeputyRoute
+  '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/school': typeof AuthenticatedSchoolRoute
   '/_authenticated/school-deputy': typeof AuthenticatedSchoolDeputyRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/student-affairs-deputy': typeof AuthenticatedStudentAffairsDeputyRoute
@@ -241,10 +259,12 @@ export interface FileRouteTypes {
     | '/counselor'
     | '/dashboard'
     | '/educational-deputy'
+    | '/inbox'
     | '/messages'
     | '/operations'
     | '/plan'
     | '/reports'
+    | '/school'
     | '/school-deputy'
     | '/settings'
     | '/student-affairs-deputy'
@@ -265,10 +285,12 @@ export interface FileRouteTypes {
     | '/counselor'
     | '/dashboard'
     | '/educational-deputy'
+    | '/inbox'
     | '/messages'
     | '/operations'
     | '/plan'
     | '/reports'
+    | '/school'
     | '/school-deputy'
     | '/settings'
     | '/student-affairs-deputy'
@@ -290,10 +312,12 @@ export interface FileRouteTypes {
     | '/_authenticated/counselor'
     | '/_authenticated/dashboard'
     | '/_authenticated/educational-deputy'
+    | '/_authenticated/inbox'
     | '/_authenticated/messages'
     | '/_authenticated/operations'
     | '/_authenticated/plan'
     | '/_authenticated/reports'
+    | '/_authenticated/school'
     | '/_authenticated/school-deputy'
     | '/_authenticated/settings'
     | '/_authenticated/student-affairs-deputy'
@@ -398,6 +422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEducationalDeputyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/inbox': {
+      id: '/_authenticated/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AuthenticatedInboxRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/messages': {
       id: '/_authenticated/messages'
       path: '/messages'
@@ -424,6 +455,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/school': {
+      id: '/_authenticated/school'
+      path: '/school'
+      fullPath: '/school'
+      preLoaderRoute: typeof AuthenticatedSchoolRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/school-deputy': {
@@ -485,10 +523,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCounselorRoute: typeof AuthenticatedCounselorRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEducationalDeputyRoute: typeof AuthenticatedEducationalDeputyRoute
+  AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedSchoolRoute: typeof AuthenticatedSchoolRoute
   AuthenticatedSchoolDeputyRoute: typeof AuthenticatedSchoolDeputyRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedStudentAffairsDeputyRoute: typeof AuthenticatedStudentAffairsDeputyRoute
@@ -505,10 +545,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCounselorRoute: AuthenticatedCounselorRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEducationalDeputyRoute: AuthenticatedEducationalDeputyRoute,
+  AuthenticatedInboxRoute: AuthenticatedInboxRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedSchoolRoute: AuthenticatedSchoolRoute,
   AuthenticatedSchoolDeputyRoute: AuthenticatedSchoolDeputyRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedStudentAffairsDeputyRoute:

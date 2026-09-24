@@ -1,222 +1,281 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, CalendarClock, ClipboardCheck, HeartHandshake, Megaphone, TrendingUp, Users } from "lucide-react";
-
 import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+  ArrowLeft,
+  Bell,
+  Building2,
+  ClipboardList,
+  FileBarChart,
+  GitBranch,
+  Inbox,
+  LayoutGrid,
+  Plus,
+  Send,
+  Users,
+} from "lucide-react";
 
 import { Bar, Chip, EmptyState, LoadingCards, Panel, PageHeader } from "@/components/app/ui-kit";
 import { api, qk } from "@/lib/data";
-import {
-  caseStatusLabels,
-  casePriorityLabels,
-  formatDate,
-  formatDateTime,
-  isoDate,
-} from "@/lib/labels";
+import { supabase } from "@/integrations/supabase/client";
+import { formatDate, isoDate } from "@/lib/labels";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "لوحة المتابعة — مِكلاف" },
-      { name: "description", content: "مؤشرات المدرسة اليومية: الطلاب، الحضور، الحالات والمواعيد." },
-      { property: "og:title", content: "لوحة المتابعة — مِكلاف" },
-      { property: "og:description", content: "نظرة شاملة على أداء المدرسة اليومي." },
+      { title: "لوحة قيادة المدرسة — مِكلاف" },
+      { name: "description", content: "لوحة تشغيل المدرسة والمهام والوارد والتقارير." },
     ],
   }),
   component: DashboardPage,
 });
 
-const quickActions = [
-  { to: "/attendance", label: "رصد الحضور", hint: "تسجيل حضور اليوم", icon: ClipboardCheck, tone: "sea" as const },
-  { to: "/counseling", label: "حالة توجيه", hint: "فتح حالة جديدة", icon: HeartHandshake, tone: "rose" as const },
-  { to: "/appointments", label: "حجز موعد", hint: "مقابلة أو لقاء", icon: CalendarClock, tone: "gold" as const },
-  { to: "/messages", label: "تعميم جديد", hint: "إعلان للمنسوبين", icon: Megaphone, tone: "leaf" as const },
+const modules = [
+  {
+    to: "/school",
+    label: "مساحة المدرسة",
+    hint: "الأعضاء والهيكل والصلاحيات",
+    icon: Building2,
+    tone: "sea" as const,
+  },
+  {
+    to: "/operations",
+    label: "مركز الأعمال",
+    hint: "الجداول والمساءلات والتعهدات",
+    icon: ClipboardList,
+    tone: "gold" as const,
+  },
+  {
+    to: "/plan",
+    label: "إسناد الأعمال",
+    hint: "المهام والمتابعة والشواهد",
+    icon: LayoutGrid,
+    tone: "rose" as const,
+  },
+  {
+    to: "/reports",
+    label: "تقارير المدرسة",
+    hint: "تجميع وتصدير المؤشرات",
+    icon: FileBarChart,
+    tone: "leaf" as const,
+  },
 ];
 
 function DashboardPage() {
-
-  const from = isoDate(new Date(Date.now() - 13 * 86400000));
   const students = useQuery({ queryKey: qk.students, queryFn: api.students });
-  const attendance = useQuery({ queryKey: ["attendance", "range", from], queryFn: () => api.attendanceRange(from) });
+  const tasks = useQuery({ queryKey: qk.tasks, queryFn: api.tasks });
   const cases = useQuery({ queryKey: qk.cases, queryFn: api.cases });
-  const appointments = useQuery({ queryKey: qk.appointments, queryFn: api.appointments });
-
-  const loading = students.isLoading || attendance.isLoading || cases.isLoading;
-
-  const rows = attendance.data ?? [];
-  const byDate = new Map<string, { present: number; total: number }>();
-  for (const row of rows) {
-    const entry = byDate.get(row.date) ?? { present: 0, total: 0 };
-    entry.total += 1;
-    if (row.status === "present") entry.present += 1;
-    byDate.set(row.date, entry);
-  }
-  const chart = [...byDate.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .slice(-10)
-    .map(([date, value]) => ({
-      day: formatDate(date),
-      حضور: value.total ? Math.round((value.present / value.total) * 100) : 0,
-    }));
-
-  const todayRows = rows.filter((row) => row.date === isoDate());
-  const todayRate = todayRows.length
-    ? Math.round((todayRows.filter((row) => row.status === "present").length / todayRows.length) * 100)
-    : chart.length
-      ? (chart[chart.length - 1]?.حضور ?? 0)
-      : 0;
-
+  const members = useQuery({
+    queryKey: ["dashboard-members"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("school_members")
+        .select("id", { count: "exact", head: true });
+      if (error) throw new Error(error.message);
+      return count ?? 0;
+    },
+  });
+  const notifications = useQuery({
+    queryKey: ["dashboard-notifications"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .is("read_at", null);
+      if (error) throw new Error(error.message);
+      return count ?? 0;
+    },
+  });
+  const loading = students.isLoading || tasks.isLoading || cases.isLoading;
+  const taskRows = tasks.data ?? [];
+  const completed = taskRows.filter((task) => task.status === "done").length;
+  const active = taskRows.filter((task) => task.status === "in_progress").length;
+  const overdue = taskRows.filter(
+    (task) => task.due_date && task.due_date < isoDate() && task.status !== "done",
+  ).length;
+  const completionRate = taskRows.length ? Math.round((completed / taskRows.length) * 100) : 0;
   const openCases = (cases.data ?? []).filter((item) => item.status !== "closed");
-  const upcoming = (appointments.data ?? []).filter((item) => new Date(item.starts_at) >= new Date());
-
-  const kpis = [
-    { label: "إجمالي الطلاب", value: String(students.data?.length ?? 0), icon: Users, tone: "sea" as const },
-    { label: "نسبة الحضور", value: `${todayRate}%`, icon: TrendingUp, tone: "leaf" as const },
-    { label: "حالات إرشادية مفتوحة", value: String(openCases.length), icon: HeartHandshake, tone: "rose" as const },
-    { label: "مواعيد قادمة", value: String(upcoming.length), icon: CalendarClock, tone: "gold" as const },
-  ];
 
   return (
-    <>
+    <div className="mx-auto w-full max-w-7xl">
       <PageHeader
-        title="لوحة المتابعة"
-        description="نظرة سريعة على أهم مؤشرات المدرسة اليوم."
-        crumbs={[{ label: "الرئيسية" }, { label: "لوحة المتابعة" }]}
-      />
-
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {quickActions.map((action) => (
+        title="لوحة قيادة المدرسة"
+        description="صورة تشغيلية واحدة للمدرسة: الأعمال، الفريق، الوارد، التقارير، والتنبيهات."
+        crumbs={[{ label: "الرئيسية" }, { label: "لوحة القيادة" }]}
+        action={
           <Link
-            key={action.to}
-            to={action.to}
-            className="panel group flex items-center gap-3 p-4 transition hover:-translate-y-0.5 hover:shadow-lg"
+            to="/school"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
           >
-            <Chip tone={action.tone}>
-              <action.icon size={14} />
-            </Chip>
-            <div className="min-w-0">
-              <div className="truncate text-sm font-bold">{action.label}</div>
-              <div className="truncate text-xs text-muted-foreground">{action.hint}</div>
-            </div>
-            <ArrowLeft size={16} className="ms-auto shrink-0 text-muted-foreground transition group-hover:-translate-x-1" />
+            <Plus size={16} /> إعداد مساحة المدرسة
           </Link>
-        ))}
-      </div>
-
+        }
+      />
       {loading ? (
-        <LoadingCards />
-
+        <LoadingCards count={4} />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {kpis.map((kpi) => (
-            <div key={kpi.label} className="panel rise-in p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">{kpi.label}</span>
-                <Chip tone={kpi.tone}>
-                  <kpi.icon size={13} />
-                </Chip>
+        <>
+          <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["الموظفون", members.data ?? 0, Users, "sea"],
+              ["كل المهام", taskRows.length, LayoutGrid, "gold"],
+              ["مكتملة", completed, ClipboardList, "leaf"],
+              ["نسبة الإنجاز", `${completionRate}%`, FileBarChart, "rose"],
+            ].map(([label, value, Icon, tone]) => (
+              <div key={String(label)} className="panel p-5">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">{label}</div>
+                  <Chip tone={tone as "sea" | "gold" | "leaf" | "rose"}>
+                    <Icon size={14} />
+                  </Chip>
+                </div>
+                <div className="mt-3 font-display text-3xl font-black">{value}</div>
               </div>
-              <div className="mt-3 font-display text-3xl font-black">{kpi.value}</div>
+            ))}
+          </div>
+          <div className="mb-5 grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
+            <Panel title="يحتاج تدخلك" description="أعمال تتطلب قرارًا أو متابعة من المدير">
+              <div className="space-y-3">
+                {[
+                  [
+                    `${overdue} مهام متأخرة`,
+                    "راجع المهام التي تجاوزت تاريخ الاستحقاق.",
+                    overdue > 0,
+                  ],
+                  [`${active} مهام قيد التنفيذ`, "تابع الأعمال النشطة مع الفريق.", active > 0],
+                  [
+                    `${openCases.length} حالات إرشادية مفتوحة`,
+                    "اطلع على الحالات التي تحتاج متابعة.",
+                    openCases.length > 0,
+                  ],
+                ].map(([title, description, visible]) => (
+                  <div
+                    key={String(title)}
+                    className="flex items-center gap-3 rounded-xl border border-border p-4"
+                  >
+                    <span
+                      className={`h-3 w-3 rounded-full ${visible ? "bg-rose" : "bg-muted-foreground/30"}`}
+                    />
+                    <div>
+                      <div className="font-bold">{title}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">{description}</div>
+                    </div>
+                    <ArrowLeft size={15} className="mr-auto text-muted-foreground" />
+                  </div>
+                ))}
+              </div>
+            </Panel>
+            <Panel title="مؤشرات سريعة">
+              <div className="space-y-4 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Inbox size={15} /> الوارد غير المقروء
+                  </span>
+                  <strong>{notifications.data ?? 0}</strong>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Send size={15} /> الصادر
+                  </span>
+                  <strong>—</strong>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Bell size={15} /> تنبيهات اليوم
+                  </span>
+                  <strong>{overdue}</strong>
+                </div>
+              </div>
+            </Panel>
+          </div>
+          <Panel title="تطبيقات المدرسة" description="كل صفحات مكلاف تعمل داخل مساحة المدرسة نفسها">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {modules.map((module) => (
+                <Link
+                  key={module.to}
+                  to={module.to}
+                  className="group rounded-2xl border border-border p-4 transition hover:-translate-y-0.5 hover:border-primary hover:bg-primary/5"
+                >
+                  <div className="flex items-center justify-between">
+                    <Chip tone={module.tone}>
+                      <module.icon size={14} />
+                    </Chip>
+                    <ArrowLeft
+                      size={15}
+                      className="text-muted-foreground transition group-hover:-translate-x-1"
+                    />
+                  </div>
+                  <div className="mt-4 font-bold">{module.label}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{module.hint}</div>
+                </Link>
+              ))}
             </div>
-          ))}
-        </div>
+          </Panel>
+          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+            <Panel title="أحدث المهام" description="تتبع التنفيذ والإسناد">
+              <ul className="space-y-3">
+                {taskRows.length === 0 ? (
+                  <EmptyState
+                    title="لا توجد مهام بعد"
+                    description="ابدأ بإنشاء مهمة من الخطة التشغيلية."
+                  />
+                ) : (
+                  taskRows.slice(0, 5).map((task) => (
+                    <li key={task.id} className="rounded-xl border border-border p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold">{task.title}</span>
+                        <Chip
+                          tone={
+                            task.status === "done"
+                              ? "leaf"
+                              : task.status === "in_progress"
+                                ? "gold"
+                                : "muted"
+                          }
+                        >
+                          {task.status}
+                        </Chip>
+                      </div>
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        {task.due_date
+                          ? `الاستحقاق: ${formatDate(task.due_date)}`
+                          : "بدون تاريخ استحقاق"}
+                      </div>
+                      <Bar
+                        value={
+                          task.status === "done" ? 100 : task.status === "in_progress" ? 55 : 15
+                        }
+                        tone="sea"
+                      />
+                    </li>
+                  ))
+                )}
+              </ul>
+            </Panel>
+            <Panel title="أحدث الطلاب" description="البيانات الأساسية داخل مساحة المدرسة">
+              <ul className="space-y-3">
+                {(students.data ?? []).length === 0 ? (
+                  <EmptyState title="لا يوجد طلاب بعد" description="استورد الطلاب من ملف Excel." />
+                ) : (
+                  (students.data ?? []).slice(0, 5).map((student) => (
+                    <li
+                      key={student.id}
+                      className="flex items-center justify-between rounded-xl border border-border p-3"
+                    >
+                      <div>
+                        <div className="font-bold">{student.full_name}</div>
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          {student.student_no} · {student.grade}
+                        </div>
+                      </div>
+                      <Chip tone="muted">{student.status}</Chip>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </Panel>
+          </div>
+        </>
       )}
-
-      <div className="mt-5 grid gap-5 lg:grid-cols-[1.4fr_0.6fr]">
-        <Panel title="اتجاه الحضور" description="نسبة الحضور اليومية خلال آخر أسبوعين">
-          {chart.length === 0 ? (
-            <EmptyState title="لا توجد بيانات حضور بعد" description="ابدأ برصد الحضور من صفحة الحضور والغياب." />
-          ) : (
-            <div className="h-64 w-full" dir="ltr">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chart}>
-                  <defs>
-                    <linearGradient id="att" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--sea)" stopOpacity={0.45} />
-                      <stop offset="95%" stopColor="var(--sea)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis dataKey="day" tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="حضور" stroke="var(--sea)" fill="url(#att)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </Panel>
-
-        <Panel title="المواعيد القادمة">
-          {upcoming.length === 0 ? (
-            <EmptyState title="لا توجد مواعيد قادمة" />
-          ) : (
-            <ul className="space-y-3">
-              {upcoming.slice(0, 5).map((item) => (
-                <li key={item.id} className="rounded-2xl border border-border p-3">
-                  <div className="text-sm font-bold">{item.title}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    {formatDateTime(item.starts_at)} · {item.location ?? "—"}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Panel>
-      </div>
-
-      <div className="mt-5 grid gap-5 lg:grid-cols-2">
-        <Panel title="حالات الموجه الطلابي النشطة">
-          {openCases.length === 0 ? (
-            <EmptyState title="لا توجد حالات مفتوحة" />
-          ) : (
-            <ul className="space-y-4">
-              {openCases.slice(0, 5).map((item) => (
-                <li key={item.id}>
-                  <div className="mb-1.5 flex items-center justify-between gap-2">
-                    <span className="text-sm font-bold">{item.title}</span>
-                    <div className="flex gap-1.5">
-                      <Chip tone={item.priority === "high" ? "rose" : item.priority === "medium" ? "gold" : "muted"}>
-                        {casePriorityLabels[item.priority]}
-                      </Chip>
-                      <Chip tone="sea">{caseStatusLabels[item.status]}</Chip>
-                    </div>
-                  </div>
-                  <Bar value={item.progress} tone="rose" />
-                </li>
-              ))}
-            </ul>
-          )}
-        </Panel>
-
-        <Panel title="أحدث الطلاب المضافين">
-          {(students.data ?? []).length === 0 ? (
-            <EmptyState title="لا يوجد طلاب بعد" description="أضف الطلاب من صفحة سجل الطلاب." />
-          ) : (
-            <ul className="space-y-3">
-              {(students.data ?? []).slice(0, 6).map((student) => (
-                <li key={student.id} className="flex items-center justify-between rounded-2xl border border-border p-3">
-                  <div>
-                    <div className="text-sm font-bold">{student.full_name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {student.student_no} · {student.grade}
-                    </div>
-                  </div>
-                  <Chip tone="muted">{student.status}</Chip>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Panel>
-      </div>
-    </>
+    </div>
   );
 }

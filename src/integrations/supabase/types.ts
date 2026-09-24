@@ -368,6 +368,7 @@ export type Database = {
           id: string
           is_demo: boolean
           nationality: string | null
+          nationality: string | null
           notes: string | null
           status: string
           student_no: string
@@ -385,6 +386,7 @@ export type Database = {
           id?: string
           is_demo?: boolean
           nationality?: string | null
+          nationality?: string | null
           notes?: string | null
           status?: string
           student_no: string
@@ -401,6 +403,7 @@ export type Database = {
           guardian_phone?: string | null
           id?: string
           is_demo?: boolean
+          nationality?: string | null
           nationality?: string | null
           notes?: string | null
           status?: string
@@ -439,6 +442,48 @@ export type Database = {
         Relationships: []
       }
     }
+      school_schedules: {
+        Row: { id: string; title: string; schedule_type: string; schedule_date: string | null; details: string | null; status: string; created_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; title: string; schedule_type?: string; schedule_date?: string | null; details?: string | null; status?: string; created_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; title?: string; schedule_type?: string; schedule_date?: string | null; details?: string | null; status?: string; created_by?: string | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      student_accountability: {
+        Row: { id: string; student_id: string | null; title: string; category: string; details: string | null; status: string; due_date: string | null; created_by: string | null; created_at: string }
+        Insert: { id?: string; student_id?: string | null; title: string; category?: string; details?: string | null; status?: string; due_date?: string | null; created_by?: string | null; created_at?: string }
+        Update: { id?: string; student_id?: string | null; title?: string; category?: string; details?: string | null; status?: string; due_date?: string | null; created_by?: string | null; created_at?: string }
+        Relationships: []
+      }
+      circulars: {
+        Row: { id: string; title: string; body: string | null; audience: string; issued_date: string; status: string; created_by: string | null; created_at: string }
+        Insert: { id?: string; title: string; body?: string | null; audience?: string; issued_date?: string; status?: string; created_by?: string | null; created_at?: string }
+        Update: { id?: string; title?: string; body?: string | null; audience?: string; issued_date?: string; status?: string; created_by?: string | null; created_at?: string }
+        Relationships: []
+      }
+      student_pledges: {
+        Row: { id: string; student_id: string | null; title: string; pledge_type: string; pledge_date: string; status: string; notes: string | null; created_by: string | null; created_at: string }
+        Insert: { id?: string; student_id?: string | null; title: string; pledge_type?: string; pledge_date?: string; status?: string; notes?: string | null; created_by?: string | null; created_at?: string }
+        Update: { id?: string; student_id?: string | null; title?: string; pledge_type?: string; pledge_date?: string; status?: string; notes?: string | null; created_by?: string | null; created_at?: string }
+        Relationships: []
+      }
+      schools: {
+        Row: { id: string; name: string; education_stage: string | null; education_type: string | null; city: string | null; education_department: string | null; district: string | null; school_year: string | null; code: string; created_by: string | null; created_at: string; updated_at: string }
+        Insert: { id?: string; name: string; education_stage?: string | null; education_type?: string | null; city?: string | null; education_department?: string | null; district?: string | null; school_year?: string | null; code: string; created_by?: string | null; created_at?: string; updated_at?: string }
+        Update: { id?: string; name?: string; education_stage?: string | null; education_type?: string | null; city?: string | null; education_department?: string | null; district?: string | null; school_year?: string | null; code?: string; created_by?: string | null; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
+      school_members: {
+        Row: { id: string; school_id: string; user_id: string; role: string; manager_id: string | null; acting_manager_id: string | null; status: string; joined_at: string }
+        Insert: { id?: string; school_id: string; user_id: string; role?: string; manager_id?: string | null; acting_manager_id?: string | null; status?: string; joined_at?: string }
+        Update: { id?: string; school_id?: string; user_id?: string; role?: string; manager_id?: string | null; acting_manager_id?: string | null; status?: string; joined_at?: string }
+        Relationships: []
+      }
+      membership_requests: {
+        Row: { id: string; school_id: string; user_id: string; requested_role: string; status: string; reviewed_by: string | null; reviewed_at: string | null; created_at: string }
+        Insert: { id?: string; school_id: string; user_id: string; requested_role?: string; status?: string; reviewed_by?: string | null; reviewed_at?: string | null; created_at?: string }
+        Update: { id?: string; school_id?: string; user_id?: string; requested_role?: string; status?: string; reviewed_by?: string | null; reviewed_at?: string | null; created_at?: string }
+        Relationships: []
+      }
       school_schedules: {
         Row: { id: string; title: string; schedule_type: string; schedule_date: string | null; details: string | null; status: string; created_by: string | null; created_at: string; updated_at: string }
         Insert: { id?: string; title: string; schedule_type?: string; schedule_date?: string | null; details?: string | null; status?: string; created_by?: string | null; created_at?: string; updated_at?: string }

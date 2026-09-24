@@ -50,6 +50,14 @@ const navGroups: { title: string; items: NavItem[] }[] = [
     ],
   },
   {
+    title: "المدرسة",
+    items: [
+      { to: "/school", label: "مساحة المدرسة", icon: Building2 },
+      { to: "/operations", label: "مركز الأعمال", icon: ClipboardList },
+      { to: "/inbox", label: "الوارد والصادر", icon: MessagesSquare },
+    ],
+  },
+  {
     title: "المجتمع المدرسي",
     items: [
       { to: "/students", label: "سجل الطلاب", icon: Users },
