@@ -17,7 +17,8 @@ import {
 import { Bar, Chip, EmptyState, LoadingCards, Panel, PageHeader } from "@/components/app/ui-kit";
 import { api, qk } from "@/lib/data";
 import { supabase } from "@/integrations/supabase/client";
-import { formatDate, isoDate } from "@/lib/labels";
+import { useAuth } from "@/lib/auth-context";
+import { formatDate, isoDate, taskStatusLabels } from "@/lib/labels";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -61,8 +62,13 @@ const modules = [
 ];
 
 function DashboardPage() {
+  const { user, isAdmin } = useAuth();
   const students = useQuery({ queryKey: qk.students, queryFn: api.students });
-  const tasks = useQuery({ queryKey: qk.tasks, queryFn: api.tasks });
+  const tasks = useQuery({
+    queryKey: [...qk.tasks, user?.id],
+    enabled: Boolean(user?.id),
+    queryFn: api.tasks,
+  });
   const cases = useQuery({ queryKey: qk.cases, queryFn: api.cases });
   const members = useQuery({
     queryKey: ["dashboard-members"],
@@ -87,6 +93,9 @@ function DashboardPage() {
   });
   const loading = students.isLoading || tasks.isLoading || cases.isLoading;
   const taskRows = tasks.data ?? [];
+  const personalTasks = taskRows
+    .filter((task) => task.assigned_to === user?.id && task.workflow_status !== "approved")
+    .slice(0, 5);
   const completed = taskRows.filter((task) => task.status === "done").length;
   const active = taskRows.filter((task) => task.status === "in_progress").length;
   const overdue = taskRows.filter(
@@ -94,6 +103,17 @@ function DashboardPage() {
   ).length;
   const completionRate = taskRows.length ? Math.round((completed / taskRows.length) * 100) : 0;
   const openCases = (cases.data ?? []).filter((item) => item.status !== "closed");
+  const summaryCards = [
+    { label: "الموظفون", value: members.data ?? 0, icon: Users, tone: "sea" as const },
+    { label: "كل المهام", value: taskRows.length, icon: LayoutGrid, tone: "gold" as const },
+    { label: "مكتملة", value: completed, icon: ClipboardList, tone: "leaf" as const },
+    {
+      label: "نسبة الإنجاز",
+      value: `${completionRate}%`,
+      icon: FileBarChart,
+      tone: "rose" as const,
+    },
+  ];
 
   return (
     <div className="mx-auto w-full max-w-7xl">
@@ -115,16 +135,11 @@ function DashboardPage() {
       ) : (
         <>
           <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              ["الموظفون", members.data ?? 0, Users, "sea"],
-              ["كل المهام", taskRows.length, LayoutGrid, "gold"],
-              ["مكتملة", completed, ClipboardList, "leaf"],
-              ["نسبة الإنجاز", `${completionRate}%`, FileBarChart, "rose"],
-            ].map(([label, value, Icon, tone]) => (
-              <div key={String(label)} className="panel p-5">
+            {summaryCards.map(({ label, value, icon: Icon, tone }) => (
+              <div key={label} className="panel p-5">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-muted-foreground">{label}</div>
-                  <Chip tone={tone as "sea" | "gold" | "leaf" | "rose"}>
+                  <Chip tone={tone}>
                     <Icon size={14} />
                   </Chip>
                 </div>
@@ -210,8 +225,87 @@ function DashboardPage() {
               ))}
             </div>
           </Panel>
-          <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            <Panel title="أحدث المهام" description="تتبع التنفيذ والإسناد">
+          <div className="mt-5 grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+            <div className="space-y-5">
+              <Panel
+                title={isAdmin ? "أعمالك كمدير المدرسة" : "أعمالك المسندة"}
+                description="قائمة شخصية للأعمال المفتوحة المسندة إلى حسابك."
+              >
+                {personalTasks.length === 0 ? (
+                  <EmptyState
+                    icon={<ClipboardList size={20} />}
+                    title="لا توجد أعمال مفتوحة مسندة إليك"
+                    description="عند إسناد عمل إلى حسابك سيظهر هنا مع موعده وحالته."
+                    action={
+                      <Link
+                        to="/work-center"
+                        className="rounded-xl border border-border px-3 py-2 text-xs font-bold hover:bg-muted"
+                      >
+                        فتح مركز الأعمال
+                      </Link>
+                    }
+                  />
+                ) : (
+                  <ul className="space-y-3">
+                    {personalTasks.map((task) => (
+                      <li key={task.id} className="rounded-xl border border-border p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="font-bold">{task.title}</div>
+                          <Chip
+                            tone={
+                              task.status === "done"
+                                ? "leaf"
+                                : task.status === "in_progress"
+                                  ? "gold"
+                                  : "muted"
+                            }
+                          >
+                            {taskStatusLabels[task.status]}
+                          </Chip>
+                        </div>
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          {task.due_date
+                            ? `الاستحقاق: ${formatDate(task.due_date)}`
+                            : "بدون تاريخ استحقاق"}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <Link
+                  to="/work-center"
+                  className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                >
+                  عرض جميع مهامي <ArrowLeft size={13} />
+                </Link>
+              </Panel>
+              <Panel title="أحدث الطلاب" description="البيانات الأساسية داخل مساحة المدرسة">
+                <ul className="space-y-3">
+                  {(students.data ?? []).length === 0 ? (
+                    <EmptyState
+                      title="لا يوجد طلاب بعد"
+                      description="استورد الطلاب من ملف Excel."
+                    />
+                  ) : (
+                    (students.data ?? []).slice(0, 5).map((student) => (
+                      <li
+                        key={student.id}
+                        className="flex items-center justify-between rounded-xl border border-border p-3"
+                      >
+                        <div>
+                          <div className="font-bold">{student.full_name}</div>
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            {student.student_no} · {student.grade}
+                          </div>
+                        </div>
+                        <Chip tone="muted">{student.status}</Chip>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </Panel>
+            </div>
+            <Panel title="أحدث الأعمال في المدرسة" description="تتبع التنفيذ والإسناد">
               <ul className="space-y-3">
                 {taskRows.length === 0 ? (
                   <EmptyState
@@ -232,7 +326,7 @@ function DashboardPage() {
                                 : "muted"
                           }
                         >
-                          {task.status}
+                          {taskStatusLabels[task.status]}
                         </Chip>
                       </div>
                       <div className="mt-1 text-xs text-muted-foreground">
@@ -246,28 +340,6 @@ function DashboardPage() {
                         }
                         tone="sea"
                       />
-                    </li>
-                  ))
-                )}
-              </ul>
-            </Panel>
-            <Panel title="أحدث الطلاب" description="البيانات الأساسية داخل مساحة المدرسة">
-              <ul className="space-y-3">
-                {(students.data ?? []).length === 0 ? (
-                  <EmptyState title="لا يوجد طلاب بعد" description="استورد الطلاب من ملف Excel." />
-                ) : (
-                  (students.data ?? []).slice(0, 5).map((student) => (
-                    <li
-                      key={student.id}
-                      className="flex items-center justify-between rounded-xl border border-border p-3"
-                    >
-                      <div>
-                        <div className="font-bold">{student.full_name}</div>
-                        <div className="mt-1 text-xs text-muted-foreground">
-                          {student.student_no} · {student.grade}
-                        </div>
-                      </div>
-                      <Chip tone="muted">{student.status}</Chip>
                     </li>
                   ))
                 )}

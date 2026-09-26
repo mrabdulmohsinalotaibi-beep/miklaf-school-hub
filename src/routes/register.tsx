@@ -7,24 +7,23 @@ import { AuthShell } from "@/components/app/AuthShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
-import { authErrorMessage, roleLabels, type AppRole } from "@/lib/labels";
+import { authErrorMessage } from "@/lib/labels";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
       { title: "إنشاء حساب — مِكلاف" },
-      { name: "description", content: "أنشئ حسابك في منصة مِكلاف لإدارة المدرسة والموجه الطلابي." },
+      {
+        name: "description",
+        content: "أنشئ حسابك للانضمام إلى فريق المدرسة، ويحدد المدير دورك الوظيفي بعد التسجيل.",
+      },
       { property: "og:title", content: "إنشاء حساب — مِكلاف" },
-      { property: "og:description", content: "انضم إلى منصة مِكلاف كمدير أو موجه طلابي أو معلم." },
+      {
+        property: "og:description",
+        content: "انضم إلى فريق المدرسة، ويعين مدير المدرسة صلاحية حسابك.",
+      },
     ],
   }),
   component: RegisterPage,
@@ -37,7 +36,6 @@ function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [role, setRole] = useState<AppRole>("teacher");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -65,7 +63,7 @@ function RegisterPage() {
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: fullName.trim(), role },
+        data: { full_name: fullName.trim() },
       },
     });
     setBusy(false);
@@ -92,8 +90,8 @@ function RegisterPage() {
           <MailCheck className="text-leaf" size={34} />
           <div className="font-display text-base font-black">أرسلنا رسالة تأكيد إلى بريدك</div>
           <p className="text-sm text-muted-foreground">
-            افتح الرسالة المرسلة إلى <span className="font-bold text-foreground">{email}</span> واضغط
-            على رابط التأكيد لتفعيل حسابك، ثم سجّل الدخول.
+            افتح الرسالة المرسلة إلى <span className="font-bold text-foreground">{email}</span>{" "}
+            واضغط على رابط التأكيد لتفعيل حسابك، ثم سجّل الدخول.
           </p>
         </div>
       </AuthShell>
@@ -124,7 +122,9 @@ function RegisterPage() {
             placeholder="مثال: محمد العتيبي"
             aria-invalid={Boolean(errors["fullName"])}
           />
-          {errors["fullName"] && <p className="mt-1 text-xs text-destructive">{errors["fullName"]}</p>}
+          {errors["fullName"] && (
+            <p className="mt-1 text-xs text-destructive">{errors["fullName"]}</p>
+          )}
         </div>
 
         <div>
@@ -142,20 +142,8 @@ function RegisterPage() {
           {errors["email"] && <p className="mt-1 text-xs text-destructive">{errors["email"]}</p>}
         </div>
 
-        <div>
-          <Label htmlFor="role">الدور الوظيفي</Label>
-          <Select value={role} onValueChange={(value) => setRole(value as AppRole)}>
-            <SelectTrigger id="role" className="mt-1.5 w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(roleLabels) as AppRole[]).map((key) => (
-                <SelectItem key={key} value={key}>
-                  {roleLabels[key]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="rounded-xl border border-border bg-muted/50 px-3 py-2.5 text-xs leading-5 text-muted-foreground">
+          يبدأ الحساب بصلاحية محدودة، ويحدد مدير المدرسة دورك الوظيفي بعد التسجيل.
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -187,7 +175,9 @@ function RegisterPage() {
               placeholder="••••••••"
               aria-invalid={Boolean(errors["confirm"])}
             />
-            {errors["confirm"] && <p className="mt-1 text-xs text-destructive">{errors["confirm"]}</p>}
+            {errors["confirm"] && (
+              <p className="mt-1 text-xs text-destructive">{errors["confirm"]}</p>
+            )}
           </div>
         </div>
 
