@@ -2,10 +2,13 @@ import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Building2,
+  BookOpenCheck,
   ClipboardList,
+  CalendarCheck,
   FileBarChart,
   Files,
   GraduationCap,
+  HeartHandshake,
   Layers3,
   LayoutDashboard,
   LogOut,
@@ -32,42 +35,71 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/lib/auth-context";
-import { roleLabels } from "@/lib/labels";
+import { roleLabels, type AppRole } from "@/lib/labels";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; adminOnly?: boolean };
 
-const navGroups: { title: string; items: NavItem[] }[] = [
+const roleWorkspaceLinks: { role: AppRole; item: NavItem }[] = [
   {
-    title: "الرئيسية",
-    items: [
-      { to: "/dashboard", label: "نظرة عامة", icon: LayoutDashboard },
-    ],
+    role: "educational_deputy",
+    item: { to: "/educational-deputy", label: "مساحة الشؤون التعليمية", icon: BookOpenCheck },
   },
   {
-    title: "سير العمل",
-    items: [
-      { to: "/work-center", label: "المهام والنماذج", icon: ClipboardList },
-      { to: "/internal-messages", label: "المراسلات", icon: MessagesSquare },
-    ],
+    role: "school_deputy",
+    item: { to: "/school-deputy", label: "مساحة الشؤون المدرسية", icon: Building2 },
   },
   {
-    title: "الخدمات",
-    items: [
-      { to: "/operations", label: "البرامج", icon: Layers3 },
-      { to: "/students", label: "السجلات الطلابية", icon: Files },
-      { to: "/reports", label: "التقارير", icon: FileBarChart },
-    ],
+    role: "student_affairs_deputy",
+    item: { to: "/student-affairs-deputy", label: "مساحة شؤون الطلاب", icon: Users },
   },
   {
-    title: "إدارة المدرسة",
-    items: [
-      { to: "/school", label: "الفريق والهيكل", icon: Users },
-      { to: "/settings", label: "إعدادات الربط", icon: Settings },
-    ],
+    role: "counselor",
+    item: { to: "/counselor", label: "مساحة الموجه الطلابي", icon: HeartHandshake },
+  },
+  {
+    role: "teacher",
+    item: { to: "/teacher", label: "مساحة المعلم", icon: CalendarCheck },
   },
 ];
+
+function getNavGroups(roles: AppRole[]) {
+  const workspaceItems: NavItem[] = [
+    {
+      to: "/dashboard",
+      label: roles.includes("administrator") ? "مساحة مدير المدرسة" : "نظرة عامة",
+      icon: LayoutDashboard,
+    },
+    ...roleWorkspaceLinks.filter(({ role }) => roles.includes(role)).map(({ item }) => item),
+  ];
+
+  return [
+    { title: "مساحة العمل", items: workspaceItems },
+    {
+      title: "سير العمل",
+      items: [
+        { to: "/work-center", label: "المهام والنماذج", icon: ClipboardList },
+        { to: "/internal-messages", label: "المراسلات", icon: MessagesSquare },
+      ],
+    },
+    {
+      title: "الخدمات",
+      items: [
+        { to: "/operations", label: "البرامج", icon: Layers3 },
+        { to: "/students", label: "السجلات الطلابية", icon: Files },
+        { to: "/reports", label: "التقارير", icon: FileBarChart },
+      ],
+    },
+    {
+      title: "إدارة المدرسة",
+      items: [
+        { to: "/school", label: "الفريق والهيكل", icon: Users },
+        { to: "/settings", label: "إعدادات الربط", icon: Settings },
+      ],
+    },
+  ];
+}
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).slice(0, 2);
@@ -77,10 +109,12 @@ function initials(name: string) {
 function SidebarContent({
   collapsed,
   isAdmin,
+  roles,
   onNavigate,
 }: {
   collapsed: boolean;
   isAdmin: boolean;
+  roles: AppRole[];
   onNavigate?: () => void;
 }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -102,7 +136,7 @@ function SidebarContent({
       </Link>
 
       <nav className="flex flex-1 flex-col gap-5">
-        {navGroups.map((group) => {
+        {getNavGroups(roles).map((group) => {
           const items = group.items.filter((item) => !item.adminOnly || isAdmin);
           if (items.length === 0) return null;
           return (
@@ -176,7 +210,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           collapsed ? "w-[84px]" : "w-[264px]",
         )}
       >
-        <SidebarContent collapsed={collapsed} isAdmin={isAdmin} />
+        <SidebarContent collapsed={collapsed} isAdmin={isAdmin} roles={roles} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -193,6 +227,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <SidebarContent
                   collapsed={false}
                   isAdmin={isAdmin}
+                  roles={roles}
                   onNavigate={() => setMobileOpen(false)}
                 />
               </SheetContent>
