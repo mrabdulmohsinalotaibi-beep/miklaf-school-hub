@@ -246,43 +246,235 @@ export type Database = {
       };
       plan_tasks: {
         Row: {
+          assigned_to: string | null;
+          completed_at: string | null;
           created_at: string;
           created_by: string | null;
           description: string | null;
           due_date: string | null;
+          evidence_required: boolean;
+          form_data: Json;
           id: string;
           is_demo: boolean;
           owner: string | null;
           progress: number;
+          recurrence: string | null;
+          school_id: string | null;
           status: Database["public"]["Enums"]["task_status"];
+          supervisor_id: string | null;
           title: string;
+          topic: string;
+          template_id: string | null;
+          updated_at: string;
+          workflow_status: string;
+        };
+        Insert: {
+          assigned_to?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          due_date?: string | null;
+          evidence_required?: boolean;
+          form_data?: Json;
+          id?: string;
+          is_demo?: boolean;
+          owner?: string | null;
+          progress?: number;
+          recurrence?: string | null;
+          school_id?: string | null;
+          status?: Database["public"]["Enums"]["task_status"];
+          supervisor_id?: string | null;
+          title: string;
+          topic?: string;
+          template_id?: string | null;
+          updated_at?: string;
+          workflow_status?: string;
+        };
+        Update: {
+          assigned_to?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          due_date?: string | null;
+          evidence_required?: boolean;
+          form_data?: Json;
+          id?: string;
+          is_demo?: boolean;
+          owner?: string | null;
+          progress?: number;
+          recurrence?: string | null;
+          school_id?: string | null;
+          status?: Database["public"]["Enums"]["task_status"];
+          supervisor_id?: string | null;
+          title?: string;
+          topic?: string;
+          template_id?: string | null;
+          updated_at?: string;
+          workflow_status?: string;
+        };
+        Relationships: [];
+      };
+      workflow_templates: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          field_schema: Json;
+          id: string;
+          is_default: boolean;
+          school_id: string | null;
+          signature_roles: Json;
+          template_key: string;
+          title: string;
+          topic: string;
           updated_at: string;
         };
         Insert: {
           created_at?: string;
           created_by?: string | null;
-          description?: string | null;
-          due_date?: string | null;
+          field_schema?: Json;
           id?: string;
-          is_demo?: boolean;
-          owner?: string | null;
-          progress?: number;
-          status?: Database["public"]["Enums"]["task_status"];
+          is_default?: boolean;
+          school_id?: string | null;
+          signature_roles?: Json;
+          template_key: string;
           title: string;
+          topic: string;
           updated_at?: string;
         };
         Update: {
           created_at?: string;
           created_by?: string | null;
-          description?: string | null;
-          due_date?: string | null;
+          field_schema?: Json;
           id?: string;
-          is_demo?: boolean;
-          owner?: string | null;
-          progress?: number;
-          status?: Database["public"]["Enums"]["task_status"];
+          is_default?: boolean;
+          school_id?: string | null;
+          signature_roles?: Json;
+          template_key?: string;
           title?: string;
+          topic?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      task_signatures: {
+        Row: {
+          assigned_by: string;
+          comment: string | null;
+          created_at: string;
+          id: string;
+          school_id: string;
+          signature_text: string | null;
+          signed_at: string | null;
+          signer_id: string;
+          signer_name: string | null;
+          signer_role: string;
+          status: string;
+          step_order: number;
+          task_id: string;
+        };
+        Insert: {
+          assigned_by: string;
+          comment?: string | null;
+          created_at?: string;
+          id?: string;
+          school_id: string;
+          signature_text?: string | null;
+          signed_at?: string | null;
+          signer_id: string;
+          signer_name?: string | null;
+          signer_role: string;
+          status?: string;
+          step_order: number;
+          task_id: string;
+        };
+        Update: {
+          assigned_by?: string;
+          comment?: string | null;
+          created_at?: string;
+          id?: string;
+          school_id?: string;
+          signature_text?: string | null;
+          signed_at?: string | null;
+          signer_id?: string;
+          signer_name?: string | null;
+          signer_role?: string;
+          status?: string;
+          step_order?: number;
+          task_id?: string;
+        };
+        Relationships: [];
+      };
+      internal_messages: {
+        Row: {
+          attachment_name: string | null;
+          attachment_path: string | null;
+          body: string;
+          created_at: string;
+          id: string;
+          read_at: string | null;
+          recipient_id: string;
+          school_id: string;
+          sender_id: string;
+          title: string;
+        };
+        Insert: {
+          attachment_name?: string | null;
+          attachment_path?: string | null;
+          body: string;
+          created_at?: string;
+          id?: string;
+          read_at?: string | null;
+          recipient_id: string;
+          school_id: string;
+          sender_id: string;
+          title: string;
+        };
+        Update: {
+          attachment_name?: string | null;
+          attachment_path?: string | null;
+          body?: string;
+          created_at?: string;
+          id?: string;
+          read_at?: string | null;
+          recipient_id?: string;
+          school_id?: string;
+          sender_id?: string;
+          title?: string;
+        };
+        Relationships: [];
+      };
+      notifications: {
+        Row: {
+          body: string | null;
+          created_at: string;
+          id: string;
+          read_at: string | null;
+          recipient_id: string;
+          school_id: string | null;
+          title: string;
+          type: string;
+        };
+        Insert: {
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          read_at?: string | null;
+          recipient_id: string;
+          school_id?: string | null;
+          title: string;
+          type?: string;
+        };
+        Update: {
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          read_at?: string | null;
+          recipient_id?: string;
+          school_id?: string | null;
+          title?: string;
+          type?: string;
         };
         Relationships: [];
       };
@@ -702,7 +894,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      can_read_workflow_task: {
+        Args: { target_task_id: string };
+        Returns: boolean;
+      };
     };
     Enums: {
       app_role:
