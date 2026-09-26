@@ -247,14 +247,15 @@ function StudentsPage() {
         let studentNo = originalNumber || `IMPORT-${Date.now()}-${index + 1}`;
         while (usedNumbers.has(studentNo) || fileNumbers.has(studentNo)) studentNo = `${studentNo}-${index + 1}`;
         fileNumbers.add(studentNo);
+        const fullName = originalName || `غير محدد — ${studentNo}`;
         const warnings = [
+          !originalName ? "الاسم ناقص — تم وضع اسم مؤقت" : "",
           !originalNumber ? "رقم الهوية ناقص — تم إنشاء رقم مؤقت" : "",
           className && !matchedClass ? "الفصل غير موجود" : "",
-          duplicate ? "رقم الهوية مكرر — لن يُحفظ" : "",
+          duplicate ? "رقم الهوية مكرر — تم توليد رقم فريد" : "",
         ].filter(Boolean);
-        const blockingIssue = !originalName ? "اسم الطالب مطلوب" : duplicate ? "رقم الهوية مكرر" : "";
         return {
-          full_name: originalName,
+          full_name: fullName,
           student_no: studentNo,
           nationality: text("nationality"),
           grade: text("grade") || grades[0],
@@ -262,8 +263,8 @@ function StudentsPage() {
           guardian_name: text("guardianName"),
           guardian_phone: normalizePhone(text("guardianPhone")) ?? "",
           class_id: matchedClass?.id ?? null,
-          valid: !blockingIssue,
-          issue: [blockingIssue, ...warnings].filter(Boolean).join("، "),
+          valid: true,
+          issue: warnings.join("، "),
         } satisfies ImportRow;
       });
       setImportRows(parsed);
