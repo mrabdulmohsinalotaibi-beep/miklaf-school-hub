@@ -321,10 +321,10 @@ function StudentsPage() {
                 <FileSpreadsheet size={16} /> قالب الاستيراد
               </Button>
               <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-bold transition-colors hover:bg-muted">
-                <Upload size={16} /> استيراد Excel
-              <input
-                type="file"
-                accept=".xlsx,.xls"
+                <Upload size={16} /> استيراد Excel / CSV
+                <input
+                  type="file"
+                  accept=".xlsx,.xls,.csv,text/csv"
                 className="hidden"
                 onChange={(event) => {
                   const file = event.target.files?.[0];
