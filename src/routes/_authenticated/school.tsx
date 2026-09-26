@@ -27,11 +27,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/lib/auth-context";
+import { roleLabels } from "@/lib/labels";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/school")({ component: SchoolWorkspacePage });
 
 type Section = "overview" | "members" | "tree" | "permissions" | "requests";
+type SchoolForm = {
+  name: string;
+  stage: string;
+  type: string;
+  city: string;
+  department: string;
+  district: string;
+  year: string;
+};
 const sections: { key: Section; label: string; icon: typeof Building2 }[] = [
   { key: "overview", label: "بيانات المدرسة", icon: Building2 },
   { key: "members", label: "أعضاء المدرسة", icon: Users },
@@ -60,7 +70,7 @@ function SchoolWorkspacePage() {
     const requested = new URLSearchParams(window.location.search).get("section") as Section | null;
     if (requested && sections.some((item) => item.key === requested)) setSection(requested);
   }, []);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<SchoolForm>({
     name: "",
     stage: "",
     type: "",
@@ -108,6 +118,35 @@ function SchoolWorkspacePage() {
       return data ?? [];
     },
   });
+  const memberIds = (members.data ?? []).map((member) => member.user_id).sort();
+  const memberProfiles = useQuery({
+    queryKey: ["school-member-profiles", school?.id, memberIds.join(",")],
+    enabled: memberIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id,full_name,email")
+        .in("id", memberIds);
+      if (error) throw new Error(error.message);
+      return Object.fromEntries((data ?? []).map((profile) => [profile.id, profile]));
+    },
+  });
+  const updateManager = useMutation({
+    mutationFn: async ({ memberId, managerId }: { memberId: string; managerId: string | null }) => {
+      if (!school?.id) throw new Error("تعذر تحديد المدرسة.");
+      const { error } = await supabase
+        .from("school_members")
+        .update({ manager_id: managerId })
+        .eq("id", memberId)
+        .eq("school_id", school.id);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      toast.success("تم تحديث الرئيس المباشر.");
+      void queryClient.invalidateQueries({ queryKey: ["school-members", school?.id] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
   const createSchool = useMutation({
     mutationFn: async () => {
       if (!form.name.trim() || !user?.id) throw new Error("اسم المدرسة مطلوب");
@@ -154,6 +193,12 @@ function SchoolWorkspacePage() {
     onError: (error) => toast.error(error.message),
   });
   const treeMembers = useMemo(() => members.data ?? [], [members.data]);
+  const currentMember = treeMembers.find((member) => member.user_id === user?.id);
+  const canManageTree =
+    isAdmin ||
+    currentMember?.role === "administrator" ||
+    currentMember?.role === "مدير مدرسة" ||
+    currentMember?.role === "admin";
 
   if (schools.isLoading) return <LoadingCards count={4} />;
   if (!school)
@@ -199,7 +244,14 @@ function SchoolWorkspacePage() {
         />
       )}
       {section === "members" && <Members members={members.data ?? []} />}
-      {section === "tree" && <Tree members={treeMembers} />}
+      {section === "tree" && (
+        <Tree
+          members={treeMembers}
+          names={memberProfiles.data ?? {}}
+          canEdit={canManageTree}
+          onManagerChange={(memberId, managerId) => updateManager.mutate({ memberId, managerId })}
+        />
+      )}
       {section === "permissions" && <Permissions />}
       {section === "requests" && (
         <Requests
@@ -218,12 +270,20 @@ function CreateSchool({
   onSubmit,
   pending,
 }: {
-  form: Record<string, string>;
-  setForm: (form: Record<string, string>) => void;
+  form: SchoolForm;
+  setForm: (form: SchoolForm) => void;
   onSubmit: () => void;
   pending: boolean;
 }) {
-  const update = (key: string, value: string) => setForm({ ...form, [key]: value });
+  const update = (key: keyof SchoolForm, value: string) => setForm({ ...form, [key]: value });
+  const detailFields: Array<{ key: Exclude<keyof SchoolForm, "name">; label: string }> = [
+    { key: "stage", label: "المرحلة التعليمية" },
+    { key: "type", label: "نوع التعليم" },
+    { key: "city", label: "المدينة" },
+    { key: "department", label: "إدارة التعليم" },
+    { key: "district", label: "الحي" },
+    { key: "year", label: "العام الدراسي" },
+  ];
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
@@ -245,14 +305,7 @@ function CreateSchool({
               placeholder="مدرسة ..."
             />
           </div>
-          {[
-            ["stage", "المرحلة التعليمية"],
-            ["type", "نوع التعليم"],
-            ["city", "المدينة"],
-            ["department", "إدارة التعليم"],
-            ["district", "الحي"],
-            ["year", "العام الدراسي"],
-          ].map(([key, label]) => (
+          {detailFields.map(({ key, label }) => (
             <div key={key}>
               <Label>{label}</Label>
               <Input
@@ -379,25 +432,91 @@ function Members({
 }
 function Tree({
   members,
+  names,
+  canEdit,
+  onManagerChange,
 }: {
-  members: Array<{ id: string; user_id: string; role: string; manager_id: string | null }>;
+  members: Array<{
+    id: string;
+    user_id: string;
+    role: string;
+    manager_id: string | null;
+    status?: string;
+  }>;
+  names: Record<string, { id: string; full_name: string; email: string }>;
+  canEdit: boolean;
+  onManagerChange: (memberId: string, managerId: string | null) => void;
 }) {
+  const getName = (userId: string) => names[userId]?.full_name || names[userId]?.email || userId;
+  const wouldCreateCycle = (memberId: string, managerId: string) => {
+    let current = members.find((member) => member.id === managerId);
+    const visited = new Set<string>();
+    while (current) {
+      if (current.id === memberId || visited.has(current.id)) return true;
+      visited.add(current.id);
+      current = members.find((member) => member.id === current?.manager_id);
+    }
+    return false;
+  };
+
   return (
-    <Panel title="الهيكل التنظيمي" description="تسلسل المسؤولية والرئيس المباشر داخل المدرسة.">
+    <Panel
+      title="الهيكل التنظيمي"
+      description="حدد الرئيس المباشر لكل عضو. يمنع النظام ربط عضو بنفسه أو بأحد مرؤوسيه."
+    >
       <div className="space-y-3">
-        <div className="rounded-xl border-2 border-primary bg-primary/10 p-4 font-bold">
-          مدير المدرسة
-        </div>
-        {members
-          .filter((member) => member.role !== "administrator")
-          .map((member) => (
-            <div key={member.id} className="mr-8 rounded-xl border border-border p-4">
-              <div className="font-bold">{member.role}</div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                المستخدم: {member.user_id} · الرئيس: {member.manager_id ?? "مدير المدرسة"}
+        {members.map((member) => {
+          const manager = members.find((item) => item.id === member.manager_id);
+          const role =
+            roleLabels[member.role as keyof typeof roleLabels] ?? member.role ?? "عضو";
+          const eligibleManagers = members.filter(
+            (candidate) =>
+              candidate.id !== member.id && !wouldCreateCycle(member.id, candidate.id),
+          );
+          return (
+            <div
+              key={member.id}
+              className="grid gap-3 rounded-xl border border-border p-4 sm:grid-cols-[minmax(0,1fr)_minmax(220px,0.8fr)] sm:items-center"
+            >
+              <div>
+                <div className="font-bold">{getName(member.user_id)}</div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {role} · الرئيس الحالي: {manager ? getName(manager.user_id) : "غير محدد"}
+                </div>
               </div>
+              {canEdit ? (
+                <Select
+                  value={member.manager_id ?? "none"}
+                  onValueChange={(value) =>
+                    onManagerChange(member.id, value === "none" ? null : value)
+                  }
+                >
+                  <SelectTrigger aria-label={`تغيير الرئيس المباشر لـ ${getName(member.user_id)}`}>
+                    <SelectValue placeholder="اختر الرئيس المباشر" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">بدون رئيس مباشر</SelectItem>
+                    {eligibleManagers.map((candidate) => (
+                      <SelectItem key={candidate.id} value={candidate.id}>
+                        {getName(candidate.user_id)} —{" "}
+                        {roleLabels[candidate.role as keyof typeof roleLabels] ?? candidate.role}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Chip tone="muted">{role}</Chip>
+              )}
             </div>
-          ))}
+          );
+        })}
+        {members.length === 0 && (
+          <EmptyState
+            icon={<Users size={20} />}
+            title="لا يوجد أعضاء"
+            description="أضف أعضاء للمدرسة قبل إعداد التسلسل الإداري."
+          />
+        )}
       </div>
     </Panel>
   );

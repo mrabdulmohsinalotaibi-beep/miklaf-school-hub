@@ -1,30 +1,21 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  BadgeCheck,
-  Bell,
   Building2,
   ClipboardList,
   FileBarChart,
   Files,
-  GitBranch,
   GraduationCap,
-  History,
-  Inbox,
-  KeyRound,
   Layers3,
   LayoutDashboard,
   LogOut,
   Menu,
+  MessagesSquare,
   Moon,
-  Paperclip,
   PanelLeftClose,
   PanelLeftOpen,
-  RefreshCw,
-  Send,
   Settings,
   Sun,
-  UserPlus,
   UserRound,
   Users,
 } from "lucide-react";
@@ -49,40 +40,30 @@ type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; adminO
 
 const navGroups: { title: string; items: NavItem[] }[] = [
   {
-    title: "المدرسة",
+    title: "الرئيسية",
     items: [
-      { to: "/dashboard", label: "لوحة قيادة المدرسة", icon: LayoutDashboard },
-      { to: "/school", label: "بيانات المدرسة", icon: Building2 },
+      { to: "/dashboard", label: "نظرة عامة", icon: LayoutDashboard },
     ],
   },
   {
-    title: "الإدارة",
+    title: "سير العمل",
     items: [
-      { to: "/school?section=tree", label: "الهيكل التنظيمي", icon: GitBranch },
-      { to: "/school?section=members", label: "أعضاء المدرسة", icon: Users },
-      { to: "/school?section=permissions", label: "الصلاحيات", icon: KeyRound },
-      { to: "/school?section=requests", label: "طلبات الانضمام", icon: UserPlus },
+      { to: "/work-center", label: "المهام والنماذج", icon: ClipboardList },
+      { to: "/internal-messages", label: "المراسلات", icon: MessagesSquare },
     ],
   },
   {
-    title: "سير الأعمال",
+    title: "الخدمات",
     items: [
-      { to: "/inbox", label: "الوارد", icon: Inbox },
-      { to: "/inbox", label: "الصادر", icon: Send },
-      { to: "/plan", label: "إسناد الأعمال", icon: ClipboardList },
-      { to: "/plan", label: "المهام المتكررة", icon: RefreshCw },
       { to: "/operations", label: "البرامج", icon: Layers3 },
-      { to: "/students", label: "السجلات", icon: Files },
+      { to: "/students", label: "السجلات الطلابية", icon: Files },
       { to: "/reports", label: "التقارير", icon: FileBarChart },
-      { to: "/operations", label: "الشواهد", icon: Paperclip },
-      { to: "/inbox", label: "الاعتمادات", icon: BadgeCheck },
     ],
   },
   {
-    title: "النظام",
+    title: "إدارة المدرسة",
     items: [
-      { to: "/inbox", label: "الإشعارات", icon: Bell },
-      { to: "/school", label: "سجل العمليات", icon: History },
+      { to: "/school", label: "الفريق والهيكل", icon: Users },
       { to: "/settings", label: "إعدادات الربط", icon: Settings },
     ],
   },

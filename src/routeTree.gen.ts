@@ -22,6 +22,7 @@ import { Route as AuthenticatedCounselorRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEducationalDeputyRouteImport } from './routes/_authenticated/educational-deputy'
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
+import { Route as AuthenticatedInternalMessagesRouteImport } from './routes/_authenticated/internal-messages'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedOperationsRouteImport } from './routes/_authenticated/operations'
 import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
@@ -32,6 +33,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedStudentAffairsDeputyRouteImport } from './routes/_authenticated/student-affairs-deputy'
 import { Route as AuthenticatedTeacherRouteImport } from './routes/_authenticated/teacher'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
+import { Route as AuthenticatedWorkCenterRouteImport } from './routes/_authenticated/work-center'
 import { Route as AuthenticatedStudentsIndexRouteImport } from './routes/_authenticated/students.index'
 import { Route as AuthenticatedStudentsIdRouteImport } from './routes/_authenticated/students.$id'
 
@@ -101,6 +103,12 @@ const AuthenticatedInboxRoute = AuthenticatedInboxRouteImport.update({
   path: '/inbox',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInternalMessagesRoute =
+  AuthenticatedInternalMessagesRouteImport.update({
+    id: '/internal-messages',
+    path: '/internal-messages',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
@@ -153,6 +161,11 @@ const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedWorkCenterRoute = AuthenticatedWorkCenterRouteImport.update({
+  id: '/work-center',
+  path: '/work-center',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedStudentsIndexRoute =
   AuthenticatedStudentsIndexRouteImport.update({
     id: '/students/',
@@ -178,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/educational-deputy': typeof AuthenticatedEducationalDeputyRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/internal-messages': typeof AuthenticatedInternalMessagesRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/plan': typeof AuthenticatedPlanRoute
@@ -188,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/student-affairs-deputy': typeof AuthenticatedStudentAffairsDeputyRoute
   '/teacher': typeof AuthenticatedTeacherRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/work-center': typeof AuthenticatedWorkCenterRoute
   '/students/$id': typeof AuthenticatedStudentsIdRoute
   '/students/': typeof AuthenticatedStudentsIndexRoute
 }
@@ -204,6 +219,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/educational-deputy': typeof AuthenticatedEducationalDeputyRoute
   '/inbox': typeof AuthenticatedInboxRoute
+  '/internal-messages': typeof AuthenticatedInternalMessagesRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/operations': typeof AuthenticatedOperationsRoute
   '/plan': typeof AuthenticatedPlanRoute
@@ -214,6 +230,7 @@ export interface FileRoutesByTo {
   '/student-affairs-deputy': typeof AuthenticatedStudentAffairsDeputyRoute
   '/teacher': typeof AuthenticatedTeacherRoute
   '/users': typeof AuthenticatedUsersRoute
+  '/work-center': typeof AuthenticatedWorkCenterRoute
   '/students/$id': typeof AuthenticatedStudentsIdRoute
   '/students': typeof AuthenticatedStudentsIndexRoute
 }
@@ -232,6 +249,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/educational-deputy': typeof AuthenticatedEducationalDeputyRoute
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
+  '/_authenticated/internal-messages': typeof AuthenticatedInternalMessagesRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/operations': typeof AuthenticatedOperationsRoute
   '/_authenticated/plan': typeof AuthenticatedPlanRoute
@@ -242,6 +260,7 @@ export interface FileRoutesById {
   '/_authenticated/student-affairs-deputy': typeof AuthenticatedStudentAffairsDeputyRoute
   '/_authenticated/teacher': typeof AuthenticatedTeacherRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
+  '/_authenticated/work-center': typeof AuthenticatedWorkCenterRoute
   '/_authenticated/students/$id': typeof AuthenticatedStudentsIdRoute
   '/_authenticated/students/': typeof AuthenticatedStudentsIndexRoute
 }
@@ -260,6 +279,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/educational-deputy'
     | '/inbox'
+    | '/internal-messages'
     | '/messages'
     | '/operations'
     | '/plan'
@@ -270,6 +290,7 @@ export interface FileRouteTypes {
     | '/student-affairs-deputy'
     | '/teacher'
     | '/users'
+    | '/work-center'
     | '/students/$id'
     | '/students/'
   fileRoutesByTo: FileRoutesByTo
@@ -286,6 +307,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/educational-deputy'
     | '/inbox'
+    | '/internal-messages'
     | '/messages'
     | '/operations'
     | '/plan'
@@ -296,6 +318,7 @@ export interface FileRouteTypes {
     | '/student-affairs-deputy'
     | '/teacher'
     | '/users'
+    | '/work-center'
     | '/students/$id'
     | '/students'
   id:
@@ -313,6 +336,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/educational-deputy'
     | '/_authenticated/inbox'
+    | '/_authenticated/internal-messages'
     | '/_authenticated/messages'
     | '/_authenticated/operations'
     | '/_authenticated/plan'
@@ -323,6 +347,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student-affairs-deputy'
     | '/_authenticated/teacher'
     | '/_authenticated/users'
+    | '/_authenticated/work-center'
     | '/_authenticated/students/$id'
     | '/_authenticated/students/'
   fileRoutesById: FileRoutesById
@@ -429,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInboxRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/internal-messages': {
+      id: '/_authenticated/internal-messages'
+      path: '/internal-messages'
+      fullPath: '/internal-messages'
+      preLoaderRoute: typeof AuthenticatedInternalMessagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/messages': {
       id: '/_authenticated/messages'
       path: '/messages'
@@ -499,6 +531,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/work-center': {
+      id: '/_authenticated/work-center'
+      path: '/work-center'
+      fullPath: '/work-center'
+      preLoaderRoute: typeof AuthenticatedWorkCenterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/students/': {
       id: '/_authenticated/students/'
       path: '/students'
@@ -524,6 +563,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEducationalDeputyRoute: typeof AuthenticatedEducationalDeputyRoute
   AuthenticatedInboxRoute: typeof AuthenticatedInboxRoute
+  AuthenticatedInternalMessagesRoute: typeof AuthenticatedInternalMessagesRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedOperationsRoute: typeof AuthenticatedOperationsRoute
   AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
@@ -534,6 +574,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedStudentAffairsDeputyRoute: typeof AuthenticatedStudentAffairsDeputyRoute
   AuthenticatedTeacherRoute: typeof AuthenticatedTeacherRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
+  AuthenticatedWorkCenterRoute: typeof AuthenticatedWorkCenterRoute
   AuthenticatedStudentsIdRoute: typeof AuthenticatedStudentsIdRoute
   AuthenticatedStudentsIndexRoute: typeof AuthenticatedStudentsIndexRoute
 }
@@ -546,6 +587,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEducationalDeputyRoute: AuthenticatedEducationalDeputyRoute,
   AuthenticatedInboxRoute: AuthenticatedInboxRoute,
+  AuthenticatedInternalMessagesRoute: AuthenticatedInternalMessagesRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedOperationsRoute: AuthenticatedOperationsRoute,
   AuthenticatedPlanRoute: AuthenticatedPlanRoute,
@@ -557,6 +599,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedStudentAffairsDeputyRoute,
   AuthenticatedTeacherRoute: AuthenticatedTeacherRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
+  AuthenticatedWorkCenterRoute: AuthenticatedWorkCenterRoute,
   AuthenticatedStudentsIdRoute: AuthenticatedStudentsIdRoute,
   AuthenticatedStudentsIndexRoute: AuthenticatedStudentsIndexRoute,
 }
