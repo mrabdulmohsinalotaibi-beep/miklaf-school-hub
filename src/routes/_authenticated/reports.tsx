@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Download, Printer } from "lucide-react";
+import { Download, FileDown, Printer, ShieldAlert } from "lucide-react";
 import {
   Bar as RBar,
   BarChart,
@@ -24,9 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EmptyState, LoadingCards, PageHeader, Panel } from "@/components/app/ui-kit";
+import { Chip, EmptyState, LoadingCards, PageHeader, Panel } from "@/components/app/ui-kit";
 import { api, qk } from "@/lib/data";
-import { exportToExcel, printReport } from "@/lib/export";
+import { exportToExcel, exportToPdf, printReport } from "@/lib/export";
+import { useAuth } from "@/lib/auth-context";
+import { useSchool } from "@/lib/school-context";
+import { reportAudience, reportKeysFor, type ReportKey } from "@/lib/report-access";
 import {
   attendanceLabels,
   caseStatusLabels,
@@ -48,8 +51,6 @@ export const Route = createFileRoute("/_authenticated/reports")({
   component: ReportsPage,
 });
 
-type ReportKey = "attendance" | "students" | "cases" | "tasks";
-
 const reportLabels: Record<ReportKey, string> = {
   attendance: "تقرير الحضور",
   students: "تقرير الطلاب",
@@ -63,6 +64,29 @@ function ReportsPage() {
   const [report, setReport] = useState<ReportKey>("attendance");
   const [days, setDays] = useState("30");
   const [grade, setGrade] = useState("all");
+
+  const { user, profile, roles, isAdmin } = useAuth();
+  const { school } = useSchool();
+  const allowedReports = useMemo(
+    () => reportKeysFor([...roles, ...(isAdmin ? ["administrator"] : [])]),
+    [roles, isAdmin],
+  );
+  /** Never leave the page on a report this account may not open. */
+  const effectiveReport: ReportKey = allowedReports.includes(report)
+    ? report
+    : (allowedReports[0] ?? "attendance");
+
+  /** Header details carried into the Excel file and the printed document. */
+  const reportMeta = useMemo(
+    () => ({
+      schoolName: school?.name ?? "مدرسة مِكلاف",
+      preparedBy: profile?.full_name || user?.email || "إدارة المدرسة",
+      subtitle: `تقرير ${reportAudience[effectiveReport]} — ${
+        school?.school_year ?? new Date().getFullYear()
+      }`,
+    }),
+    [school?.name, school?.school_year, profile?.full_name, user?.email, effectiveReport],
+  );
 
   const from = isoDate(new Date(Date.now() - Number(days) * 86400000));
   const students = useQuery({ queryKey: qk.students, queryFn: api.students });
@@ -83,7 +107,7 @@ function ReportsPage() {
     students.isLoading || attendance.isLoading || cases.isLoading || tasks.isLoading;
 
   const table = useMemo<{ headers: string[]; rows: (string | number)[][] }>(() => {
-    if (report === "attendance") {
+    if (effectiveReport === "attendance") {
       return {
         headers: ["التاريخ", "الطالب", "الحالة"],
         rows: (attendance.data ?? []).map((row) => [
@@ -93,7 +117,7 @@ function ReportsPage() {
         ]),
       };
     }
-    if (report === "students") {
+    if (effectiveReport === "students") {
       return {
         headers: ["الاسم", "الرقم", "الصف", "المعدل", "الحالة"],
         rows: (students.data ?? [])
@@ -107,7 +131,7 @@ function ReportsPage() {
           ]),
       };
     }
-    if (report === "cases") {
+    if (effectiveReport === "cases") {
       return {
         headers: ["الحالة", "الطالب", "التصنيف", "الوضع", "التقدم"],
         rows: (cases.data ?? []).map((item) => [
@@ -129,7 +153,7 @@ function ReportsPage() {
         `${task.progress}%`,
       ]),
     };
-  }, [report, attendance.data, students.data, cases.data, tasks.data, studentNames, grade]);
+  }, [effectiveReport, attendance.data, students.data, cases.data, tasks.data, studentNames, grade]);
 
   const attendancePie = useMemo(() => {
     const counts = new Map<AttendanceStatus, number>();
@@ -161,13 +185,13 @@ function ReportsPage() {
         crumbs={[{ label: "لوحة المتابعة", to: "/dashboard" }, { label: "التقارير" }]}
         action={
           <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              onClick={() => exportToExcel(reportLabels[report], table.headers, table.rows)}
-            >
+            <Button variant="secondary" onClick={() => exportToExcel(reportLabels[effectiveReport], table.headers, table.rows, reportMeta)}>
               <Download size={16} /> تصدير Excel
             </Button>
-            <Button onClick={() => printReport(reportLabels[report], table.headers, table.rows)}>
+            <Button variant="outline" onClick={() => exportToPdf(reportLabels[effectiveReport], table.headers, table.rows, reportMeta)}>
+              <FileDown size={16} /> حفظ PDF
+            </Button>
+            <Button onClick={() => printReport(reportLabels[effectiveReport], table.headers, table.rows, reportMeta)}>
               <Printer size={16} /> طباعة
             </Button>
           </div>
@@ -176,12 +200,15 @@ function ReportsPage() {
 
       <Panel className="mb-5">
         <div className="flex flex-wrap gap-3">
-          <Select value={report} onValueChange={(value) => setReport(value as ReportKey)}>
-            <SelectTrigger className="w-56">
+          <Select
+            value={effectiveReport}
+            onValueChange={(value) => setReport(value as ReportKey)}
+          >
+            <SelectTrigger className="w-56" aria-label="اختر التقرير">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {(Object.keys(reportLabels) as ReportKey[]).map((key) => (
+              {allowedReports.map((key) => (
                 <SelectItem key={key} value={key}>
                   {reportLabels[key]}
                 </SelectItem>
@@ -200,7 +227,7 @@ function ReportsPage() {
             </SelectContent>
           </Select>
 
-          {report === "students" && (
+          {effectiveReport === "students" && (
             <Select value={grade} onValueChange={setGrade}>
               <SelectTrigger className="w-44">
                 <SelectValue />
@@ -262,7 +289,7 @@ function ReportsPage() {
             </Panel>
           </div>
 
-          <Panel title={reportLabels[report]} description={`${table.rows.length} سجل`}>
+          <Panel title={reportLabels[effectiveReport]} description={`${table.rows.length} سجل`}>
             {table.rows.length === 0 ? (
               <EmptyState title="لا توجد بيانات" description="غيّر الفترة أو التصفية." />
             ) : (

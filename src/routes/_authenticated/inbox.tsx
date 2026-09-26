@@ -42,12 +42,12 @@ function InboxPage() {
       />
       <div className="mb-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          ["الوارد", notifications.data?.length ?? 0, InboxIcon, "sea"],
-          ["للمراجعة", "—", ShieldCheck, "gold"],
-          ["المعتمد", "—", CheckCircle2, "leaf"],
-          ["المتأخر", "—", Clock3, "rose"],
-        ].map(([label, value, Icon, tone]) => (
-          <div key={String(label)} className="panel p-5">
+          { label: "الوارد", value: notifications.data?.length ?? 0, icon: InboxIcon, tone: "sea" },
+          { label: "للمراجعة", value: "—", icon: ShieldCheck, tone: "gold" },
+          { label: "المعتمد", value: "—", icon: CheckCircle2, tone: "leaf" },
+          { label: "المتأخر", value: "—", icon: Clock3, tone: "rose" },
+        ].map(({ label, value, icon: Icon, tone }) => (
+          <div key={label} className="panel p-5">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">{label}</span>
               <Chip tone={tone as "sea" | "gold" | "leaf" | "rose"}>

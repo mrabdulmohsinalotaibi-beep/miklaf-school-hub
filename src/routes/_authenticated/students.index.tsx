@@ -189,7 +189,8 @@ function StudentsPage() {
     setImportError("");
     try {
       const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const firstSheetName = workbook.SheetNames[0];
+      const sheet = firstSheetName ? workbook.Sheets[firstSheetName] : undefined;
       if (!sheet) throw new Error("الملف لا يحتوي على ورقة عمل.");
       const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
       if (rows.length === 0) throw new Error("لا توجد بيانات بعد صف العناوين.");
@@ -221,7 +222,7 @@ function StudentsPage() {
           guardian_phone: text("رقم جوال ولي الأمر"),
           class_id: matchedClass?.id ?? null,
           valid: true,
-          issue: warnings.join("، ") || undefined,
+          issue: warnings.join("، "),
         } satisfies ImportRow;
       });
       setImportRows(parsed);

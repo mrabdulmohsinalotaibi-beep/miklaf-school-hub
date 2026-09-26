@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
+  BellRing,
   Building2,
   BookOpenCheck,
   ClipboardList,
@@ -23,7 +24,7 @@ import {
   Users,
 } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { BrandAvatar, Logo } from "@/components/app/Logo";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -35,12 +36,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/lib/auth-context";
+import { useSchool } from "@/lib/school-context";
 import { roleLabels, type AppRole } from "@/lib/labels";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
-type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; adminOnly?: boolean };
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard };
 
+/** One workspace page per role, exactly as the brief describes. */
 const roleWorkspaceLinks: { role: AppRole; item: NavItem }[] = [
   {
     role: "educational_deputy",
@@ -64,14 +67,15 @@ const roleWorkspaceLinks: { role: AppRole; item: NavItem }[] = [
   },
 ];
 
-function getNavGroups(roles: AppRole[]) {
+function getNavGroups(roles: AppRole[], workspaceRole: string | null) {
+  const effective = new Set<string>([...roles, ...(workspaceRole ? [workspaceRole] : [])]);
   const workspaceItems: NavItem[] = [
     {
       to: "/dashboard",
-      label: roles.includes("administrator") ? "مساحة مدير المدرسة" : "نظرة عامة",
+      label: effective.has("administrator") ? "مساحة مدير المدرسة" : "لوحة القيادة",
       icon: LayoutDashboard,
     },
-    ...roleWorkspaceLinks.filter(({ role }) => roles.includes(role)).map(({ item }) => item),
+    ...roleWorkspaceLinks.filter(({ role }) => effective.has(role)).map(({ item }) => item),
   ];
 
   return [
@@ -79,100 +83,94 @@ function getNavGroups(roles: AppRole[]) {
     {
       title: "سير العمل",
       items: [
-        { to: "/work-center", label: "المهام والنماذج", icon: ClipboardList },
-        { to: "/internal-messages", label: "المراسلات", icon: MessagesSquare },
+        { to: "/work-center", label: "مركز الأعمال والمهام", icon: ClipboardList },
+        { to: "/internal-messages", label: "الرسائل والإشعارات", icon: MessagesSquare },
       ],
     },
     {
       title: "الخدمات",
       items: [
-        { to: "/operations", label: "البرامج", icon: Layers3 },
-        { to: "/students", label: "السجلات الطلابية", icon: Files },
+        { to: "/students", label: "الطلاب", icon: Files },
+        { to: "/attendance", label: "الحضور والغياب", icon: CalendarCheck },
+        { to: "/counseling", label: "الإرشاد الطلابي", icon: HeartHandshake },
+        { to: "/operations", label: "العمليات والخطة", icon: Layers3 },
+        { to: "/appointments", label: "المواعيد والمقابلات", icon: BellRing },
         { to: "/reports", label: "التقارير", icon: FileBarChart },
       ],
     },
     {
       title: "إدارة المدرسة",
       items: [
-        { to: "/school", label: "الفريق والهيكل", icon: Users },
-        { to: "/settings", label: "إعدادات الربط", icon: Settings },
+        { to: "/school", label: "أعضاء المدرسة والصلاحيات", icon: Users },
+        { to: "/settings", label: "الإعدادات", icon: Settings },
       ],
     },
   ];
 }
 
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((part) => part[0] ?? "").join("") || "م";
-}
-
 function SidebarContent({
   collapsed,
-  isAdmin,
   roles,
+  workspaceRole,
   onNavigate,
 }: {
   collapsed: boolean;
-  isAdmin: boolean;
   roles: AppRole[];
+  workspaceRole: string | null;
   onNavigate?: () => void;
 }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const { school } = useSchool();
 
   return (
     <div className="flex h-full flex-col gap-6 overflow-y-auto p-4">
       <Link to="/dashboard" onClick={onNavigate} className="flex items-center gap-3 px-1">
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-sidebar-primary font-display text-lg font-black text-sidebar-primary-foreground">
-          م
-        </div>
-        {!collapsed && (
-          <div>
-            <div className="font-display text-lg font-black text-sidebar-foreground">مِكلاف</div>
-            <div className="text-[10px] tracking-[0.18em] text-sidebar-foreground/60">
-              منصة إدارة المدرسة
-            </div>
-          </div>
+        {collapsed ? (
+          <Logo variant="avatar" size="xs" className="h-10 w-10 rounded-xl" />
+        ) : (
+          <span className="flex min-w-0 flex-col gap-1">
+            <Logo variant="wordmark" tone="light" size="sm" />
+            <span className="truncate text-[10px] tracking-[0.18em] text-sidebar-foreground/60">
+              {school?.name ?? "منصة إدارة المدرسة"}
+            </span>
+          </span>
         )}
       </Link>
 
       <nav className="flex flex-1 flex-col gap-5">
-        {getNavGroups(roles).map((group) => {
-          const items = group.items.filter((item) => !item.adminOnly || isAdmin);
-          if (items.length === 0) return null;
-          return (
-            <div key={group.title}>
-              {!collapsed && (
-                <div className="mb-2 px-2 text-[10px] font-bold tracking-[0.18em] text-sidebar-foreground/45">
-                  {group.title}
-                </div>
-              )}
-              <div className="space-y-1">
-                {items.map((item) => {
-                  const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      onClick={onNavigate}
-                      title={collapsed ? item.label : undefined}
-                      className={cn(
-                        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
-                        active
-                          ? "bg-sidebar-accent text-sidebar-primary"
-                          : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
-                        collapsed && "justify-center px-0",
-                      )}
-                    >
-                      <Icon size={18} aria-hidden />
-                      {!collapsed && <span>{item.label}</span>}
-                    </Link>
-                  );
-                })}
+        {getNavGroups(roles, workspaceRole).map((group) => (
+          <div key={group.title}>
+            {!collapsed && (
+              <div className="mb-2 px-2 text-[10px] font-bold tracking-[0.18em] text-sidebar-foreground/45">
+                {group.title}
               </div>
+            )}
+            <div className="space-y-1">
+              {group.items.map((item) => {
+                const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={onNavigate}
+                    title={collapsed ? item.label : undefined}
+                    className={cn(
+                      "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors",
+                      active
+                        ? "bg-sidebar-accent text-sidebar-primary"
+                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
+                      collapsed && "justify-center px-0",
+                    )}
+                  >
+                    <Icon size={18} aria-hidden />
+                    {!collapsed && <span>{item.label}</span>}
+                  </Link>
+                );
+              })}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </nav>
 
       {!collapsed && (
@@ -180,7 +178,7 @@ function SidebarContent({
           <div className="mb-1 flex items-center gap-2 font-bold text-sidebar-primary">
             <GraduationCap size={14} /> نظام مدرسي متكامل
           </div>
-          جميع البيانات محفوظة ومؤمَّنة بصلاحيات الوصول.
+          الصلاحيات مطبقة في قاعدة البيانات، لا في الواجهة فقط.
         </div>
       )}
     </div>
@@ -191,11 +189,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { profile, user, roles, isAdmin, signOut } = useAuth();
+  const { school, workspaceRole } = useSchool();
   const { theme, toggle } = useTheme();
   const navigate = useNavigate();
 
   const name = profile?.full_name || user?.email || "مستخدم";
-  const roleLabel = roles[0] ? roleLabels[roles[0]] : "عضو";
+  const roleLabel =
+    (workspaceRole && roleLabels[workspaceRole as AppRole]) ||
+    (roles[0] && roleLabels[roles[0]]) ||
+    (isAdmin ? roleLabels.administrator : "عضو");
 
   const handleSignOut = async () => {
     await signOut();
@@ -210,7 +212,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           collapsed ? "w-[84px]" : "w-[264px]",
         )}
       >
-        <SidebarContent collapsed={collapsed} isAdmin={isAdmin} roles={roles} />
+        <SidebarContent collapsed={collapsed} roles={roles} workspaceRole={workspaceRole} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -226,12 +228,16 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <SheetTitle className="sr-only">القائمة الرئيسية</SheetTitle>
                 <SidebarContent
                   collapsed={false}
-                  isAdmin={isAdmin}
                   roles={roles}
+                  workspaceRole={workspaceRole}
                   onNavigate={() => setMobileOpen(false)}
                 />
               </SheetContent>
             </Sheet>
+
+            <Link to="/dashboard" className="lg:hidden" aria-label="مِكلاف">
+              <Logo variant="wordmark" size="xs" />
+            </Link>
 
             <Button
               variant="ghost"
@@ -252,11 +258,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 rounded-xl border border-border bg-background px-2 py-1.5 text-right transition-colors hover:bg-muted">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-navy text-xs font-bold text-navy-foreground">
-                      {initials(name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <BrandAvatar />
                   <span className="hidden sm:block">
                     <span className="block text-xs font-bold leading-4">{name}</span>
                     <span className="block text-[10px] text-muted-foreground">{roleLabel}</span>

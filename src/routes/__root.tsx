@@ -10,7 +10,9 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
+import { Logo } from "@/components/app/Logo";
 import { AuthProvider } from "@/lib/auth-context";
+import { SchoolProvider } from "@/lib/school-context";
 import { ThemeProvider } from "@/lib/theme";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -18,8 +20,11 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <div className="font-display text-7xl font-black text-primary">٤٠٤</div>
+      <div className="flex max-w-md flex-col items-center text-center">
+        <Link to="/" aria-label="الصفحة الرئيسية لمنصة مِكلاف">
+          <Logo variant="full" size="lg" />
+        </Link>
+        <div className="mt-4 font-display text-7xl font-black text-primary">٤٠٤</div>
         <h1 className="mt-4 font-display text-xl font-black text-foreground">الصفحة غير موجودة</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           الرابط الذي فتحته غير صحيح أو تم نقل الصفحة إلى مكان آخر.
@@ -52,8 +57,11 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="font-display text-xl font-black text-foreground">تعذّر تحميل الصفحة</h1>
+      <div className="flex max-w-md flex-col items-center text-center">
+        <Link to="/" aria-label="الصفحة الرئيسية لمنصة مِكلاف">
+          <Logo variant="full" size="lg" />
+        </Link>
+        <h1 className="mt-4 font-display text-xl font-black text-foreground">تعذّر تحميل الصفحة</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           حدث خطأ غير متوقع. يمكنك إعادة المحاولة أو العودة للصفحة الرئيسية.
         </p>
@@ -88,11 +96,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "منصة مدرسية عربية متكاملة لإدارة الطلاب والحضور والموجه الطلابي والمواعيد والخطة التشغيلية والتقارير.",
+          "منصة عربية متجاوبة لإدارة أعمال المدرسة ومتابعة الطلاب والموظفين والمهام وحالات الإرشاد الطلابي والتقارير، بصلاحيات دقيقة لكل دور.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "مِكلاف" },
+      { property: "og:image", content: "/brand/og-image.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "شعار منصة مِكلاف — منصة إدارة المدرسة" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "#142636" },
+      { name: "twitter:image", content: "/brand/og-image.png" },
+      { name: "theme-color", content: "#7E2320" },
+      { name: "apple-mobile-web-app-title", content: "مِكلاف" },
+      { name: "application-name", content: "مِكلاف" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -102,7 +118,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", href: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
     ],
   }),
   shellComponent: RootShell,
@@ -132,9 +152,11 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-          <Toaster position="top-center" richColors dir="rtl" />
+          <SchoolProvider>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+            <Toaster position="top-center" richColors dir="rtl" />
+          </SchoolProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

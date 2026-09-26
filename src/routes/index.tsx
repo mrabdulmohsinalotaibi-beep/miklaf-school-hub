@@ -3,6 +3,8 @@ import {
   BarChart3,
   CalendarClock,
   ClipboardList,
+  FileSpreadsheet,
+  History,
   HeartHandshake,
   LayoutDashboard,
   Lock,
@@ -10,24 +12,27 @@ import {
   MoveLeft,
   ShieldCheck,
   Users,
+  Workflow,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { BrandLockup, Logo } from "@/components/app/Logo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "مِكلاف — منصة إدارة المدرسة والموجه الطلابي" },
+      { title: "مِكلاف — منصة إدارة المدرسة ومتابعة الطلاب والموظفين" },
       {
         name: "description",
         content:
-          "منصة عربية متكاملة لإدارة الطلاب والحضور وحالات الموجه الطلابي والمواعيد والخطة التشغيلية والتقارير، بواجهة حديثة وصلاحيات آمنة.",
+          "منصة عربية متجاوبة لتجميع أعمال المدرسة في مكان واحد: الطلاب والحضور ومركز الأعمال والإرشاد الطلابي والمواعيد والتقارير، بصلاحيات مطبقة في الخادم وقاعدة البيانات.",
       },
-      { property: "og:title", content: "مِكلاف — منصة إدارة المدرسة والموجه الطلابي" },
+      { property: "og:title", content: "مِكلاف — منصة إدارة المدرسة ومتابعة الطلاب والموظفين" },
       {
         property: "og:description",
-        content: "أدِر مدرستك من مكان واحد: الطلاب، الحضور، التوجيه، المواعيد، التقارير.",
+        content: "أدِر مدرستك من مكان واحد: الطلاب، الحضور، المهام، الإرشاد، المواعيد، التقارير.",
       },
+      { property: "og:image", content: "/brand/og-image.png" },
     ],
   }),
   component: LandingPage,
@@ -41,12 +46,39 @@ const features = [
   { icon: CalendarClock, title: "المواعيد والمقابلات", desc: "جدولة المقابلات مع أولياء الأمور بعرض تقويمي." },
   { icon: MessagesSquare, title: "إعلانات داخلية", desc: "تواصل منظم بين الإدارة والمعلمين والموجهين." },
   { icon: BarChart3, title: "تقارير قابلة للتصدير", desc: "تقارير مفلترة مع تصدير إلى إكسل ونسخة للطباعة." },
-  { icon: ShieldCheck, title: "صلاحيات وأدوار", desc: "مدير، موجه طلابي، معلم — كل دور يرى ما يخصه." },
+  {
+    icon: ShieldCheck,
+    title: "صلاحيات وأدوار",
+    desc: "ستة أدوار وظيفية، ومساحة عمل مستقلة لكل دور يرى ما يخصه فقط.",
+  },
+  {
+    icon: Workflow,
+    title: "مهام واعتمادات",
+    desc: "إسناد العمل، إرساله للاعتماد، ثم قبوله أو إعادته مع ملاحظة وسبب.",
+  },
+  {
+    icon: FileSpreadsheet,
+    title: "استيراد الطلاب",
+    desc: "استيراد من Excel مع معاينة الصفوف وكشف التكرار قبل الحفظ.",
+  },
+  {
+    icon: History,
+    title: "سجل تدقيق",
+    desc: "تسجيل تغييرات الأدوار والاعتمادات وكل إجراء إداري مهم.",
+  },
 ];
 
 const steps = [
-  { num: "١", title: "أنشئ حسابك", desc: "سجّل ببريدك الإلكتروني واختر دورك الوظيفي، ثم أكّد بريدك." },
-  { num: "٢", title: "أدخل بيانات المدرسة", desc: "أضف الفصول والطلاب أو ابدأ من البيانات التجريبية الجاهزة." },
+  {
+    num: "١",
+    title: "أنشئ حسابك",
+    desc: "سجّل ببريدك الإلكتروني، ويبدأ حسابك بصلاحية محدودة، ثم أكّد بريدك.",
+  },
+  {
+    num: "٢",
+    title: "يعيّن المدير دورك",
+    desc: "يمنحك مدير المدرسة دورك الوظيفي: وكيل شؤون تعليمية أو مدرسية أو طلاب، أو موجه، أو معلم.",
+  },
   { num: "٣", title: "أدِر يومك المدرسي", desc: "ارصد الحضور، تابع الحالات، جدول المواعيد، وأصدر التقارير." },
 ];
 
@@ -56,15 +88,7 @@ function LandingPage() {
       <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-navy font-display text-lg font-black text-gold">
-              م
-            </div>
-            <div>
-              <div className="font-display text-lg font-black">مِكلاف</div>
-              <div className="text-[10px] tracking-[0.18em] text-muted-foreground">
-                منصة إدارة المدرسة
-              </div>
-            </div>
+            <BrandLockup size="sm" />
           </Link>
           <div className="flex items-center gap-2">
             <Button variant="ghost" asChild>
@@ -194,10 +218,8 @@ function LandingPage() {
       <footer className="border-t border-border bg-card">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-xl bg-navy font-display text-sm font-black text-gold">
-              م
-            </div>
-            منصة مِكلاف — إدارة المدرسة والموجه الطلابي
+            <Logo variant="wordmark" size="xs" />
+            <span>منصة مِكلاف — إدارة المدرسة والموجه الطلابي</span>
           </div>
           <div className="flex gap-5">
             <Link to="/login" className="transition-colors hover:text-foreground">

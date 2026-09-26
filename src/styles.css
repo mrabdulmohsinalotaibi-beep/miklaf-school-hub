@@ -4,6 +4,16 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Miklaf brand palette.
+ *
+ * Every brand value below is sampled from the supplied logo artwork
+ * (public/brand/miklaf-logo.png): the ink is maroon #7E2320 and the paper
+ * behind it is #F7F8F9. The neutral scale is that maroon family; the warm
+ * status colours are the brass and olive tones that sit next to it, so the
+ * interface stays inside the logo's own family instead of importing a
+ * different school palette.
+ */
 @theme inline {
   --font-sans: "IBM Plex Sans Arabic", system-ui, sans-serif;
   --font-display: "Cairo", system-ui, sans-serif;
@@ -47,6 +57,19 @@
   --color-leaf: var(--leaf);
   --color-leaf-soft: var(--leaf-soft);
 
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
+  --color-paper: var(--paper);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -64,79 +87,120 @@
 }
 
 :root {
-  --radius: 0.8rem;
+  --radius: 0.85rem;
 
-  --background: oklch(0.975 0.003 240);
-  --foreground: oklch(0.255 0.027 248);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.255 0.027 248);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.255 0.027 248);
+  /* Maroon scale taken from the logo ink (#7E2320) and the paper (#F7F8F9). */
+  --brand-50: #fbf1ef;
+  --brand-100: #f6dfdb;
+  --brand-200: #e9bdb7;
+  --brand-300: #d8948c;
+  --brand-400: #c2685f;
+  --brand-500: #a6443c;
+  --brand-600: #8e2e28;
+  --brand-700: #7e2320;
+  --brand-800: #631c1a;
+  --brand-900: #4a1513;
+  --brand-950: #2e0d0c;
+  --paper: #f7f8f9;
 
-  --primary: #0f766e;
+  --background: #f7f6f6;
+  --foreground: #2b1b1a;
+  --card: #ffffff;
+  --card-foreground: #2b1b1a;
+  --popover: #ffffff;
+  --popover-foreground: #2b1b1a;
+
+  --primary: #7e2320;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #475569;
-  --muted: oklch(0.958 0.004 240);
-  --muted-foreground: oklch(0.584 0.013 240);
-  --accent: #fef3c7;
-  --accent-foreground: #92400e;
-  --destructive: #9f1239;
+  --secondary: #f4e7e4;
+  --secondary-foreground: #63201d;
+  --muted: #f1eeed;
+  --muted-foreground: #6d5f5d;
+  --accent: #f6e3dc;
+  --accent-foreground: #7e2320;
+  --destructive: #7e2320;
   --destructive-foreground: #ffffff;
-  --border: oklch(0.917 0.005 240);
-  --input: oklch(0.9 0.008 235);
-  --ring: #0f766e;
+  --border: #e6dedb;
+  --input: #dbd1cd;
+  --ring: #7e2320;
 
-  --navy: #475569;
-  --navy-foreground: #ffffff;
-  --gold: #b45309;
-  --gold-soft: #fff7ed;
-  --rose: #9f1239;
-  --rose-soft: #fff1f2;
-  --sea: #0f766e;
-  --sea-soft: #ecfdf5;
-  /* Brand palette: navy, sea, gold, and rose. Leaf is a semantic alias of sea. */
-  --leaf: #0f766e;
-  --leaf-soft: #ecfdf5;
+  /* Dark maroon surface used for heroes, the sidebar and report headers. */
+  --navy: #4a1513;
+  --navy-foreground: #fbf1ef;
+  /* Brass accent that accompanies the maroon in charts and highlights. */
+  --gold: #a9762f;
+  --gold-soft: #fdf3e3;
+  --rose: #7e2320;
+  --rose-soft: #fbf1ef;
+  --sea: #9c3a33;
+  --sea-soft: #f8ece9;
+  /* Functional success tone, kept warm so it sits inside the same family. */
+  --leaf: #4e6b50;
+  --leaf-soft: #eef4ee;
 
-  --chart-1: #7f1d1d;
-  --chart-2: #0f766e;
-  --chart-3: #b45309;
-  --chart-4: #475569;
-  --chart-5: #9f1239;
+  --chart-1: #7e2320;
+  --chart-2: #a6443c;
+  --chart-3: #a9762f;
+  --chart-4: #4e6b50;
+  --chart-5: #c2685f;
 
-  --sidebar: #475569;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #f59e0b;
-  --sidebar-primary-foreground: #451a03;
-  --sidebar-accent: #334155;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #64748b;
-  --sidebar-ring: #f59e0b;
+  --sidebar: #4a1513;
+  --sidebar-foreground: #fbf1ef;
+  --sidebar-primary: #e9bdb7;
+  --sidebar-primary-foreground: #3b100f;
+  --sidebar-accent: #631c1a;
+  --sidebar-accent-foreground: #fbf1ef;
+  --sidebar-border: rgba(255, 255, 255, 0.14);
+  --sidebar-ring: #e9bdb7;
 }
 
 .dark {
-  --background: oklch(0.205 0.03 246);
-  --foreground: oklch(0.97 0.005 240);
-  --card: oklch(0.255 0.032 246);
-  --card-foreground: oklch(0.97 0.005 240);
-  --popover: oklch(0.255 0.032 246);
-  --popover-foreground: oklch(0.97 0.005 240);
-  --primary: oklch(0.62 0.105 178);
-  --primary-foreground: oklch(0.98 0.005 20);
-  --secondary: oklch(0.31 0.03 245);
-  --secondary-foreground: oklch(0.97 0.005 240);
-  --muted: oklch(0.31 0.03 245);
-  --muted-foreground: oklch(0.73 0.015 240);
-  --accent: oklch(0.38 0.07 78);
-  --accent-foreground: oklch(0.95 0.03 84);
-  --destructive: oklch(0.63 0.13 18);
-  --destructive-foreground: oklch(0.98 0.005 20);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.62 0.105 178);
-  --sidebar: oklch(0.225 0.032 246);
-  --sidebar-border: oklch(1 0 0 / 12%);
+  --background: #1d0f0e;
+  --foreground: #f7edeb;
+  --card: #2a1514;
+  --card-foreground: #f7edeb;
+  --popover: #2a1514;
+  --popover-foreground: #f7edeb;
+
+  --primary: #d8948c;
+  --primary-foreground: #2e0d0c;
+  --secondary: #3a1d1b;
+  --secondary-foreground: #f6dfdb;
+  --muted: #341a18;
+  --muted-foreground: #c7adaa;
+  --accent: #4a1513;
+  --accent-foreground: #f6dfdb;
+  --destructive: #d8948c;
+  --destructive-foreground: #2e0d0c;
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.16);
+  --ring: #d8948c;
+
+  --navy: #2e0d0c;
+  --navy-foreground: #fbf1ef;
+  --gold: #d3a15f;
+  --gold-soft: #3a2a16;
+  --rose: #d8948c;
+  --rose-soft: #3a1d1b;
+  --sea: #c2685f;
+  --sea-soft: #3a2220;
+  --leaf: #86a487;
+  --leaf-soft: #22301f;
+
+  --chart-1: #d8948c;
+  --chart-2: #c2685f;
+  --chart-3: #d3a15f;
+  --chart-4: #86a487;
+  --chart-5: #e9bdb7;
+
+  --sidebar: #2e0d0c;
+  --sidebar-foreground: #fbf1ef;
+  --sidebar-primary: #e9bdb7;
+  --sidebar-primary-foreground: #2e0d0c;
+  --sidebar-accent: #4a1513;
+  --sidebar-accent-foreground: #fbf1ef;
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+  --sidebar-ring: #e9bdb7;
 }
 
 @layer base {
@@ -156,6 +220,11 @@
   h3,
   .font-display {
     font-family: var(--font-display);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
 }
 
@@ -178,7 +247,7 @@
   border-radius: 22px;
   border: 1px solid var(--color-border);
   background-color: var(--color-card);
-  box-shadow: 0 8px 26px oklch(0.3 0.03 246 / 6%);
+  box-shadow: 0 8px 26px oklch(0.35 0.05 25 / 7%);
 }
 
 @media (prefers-reduced-motion: reduce) {
