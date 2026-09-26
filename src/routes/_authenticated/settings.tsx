@@ -3,11 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 import { PageHeader, Panel } from "@/components/app/ui-kit";
+import { WhatsAppButton } from "@/components/app/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { normalizePhone, whatsappMessage } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -39,7 +41,7 @@ function SettingsPage() {
     setBusy(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ full_name: fullName.trim(), phone: phone.trim() || null })
+      .update({ full_name: fullName.trim(), phone: normalizePhone(phone) || null })
       .eq("id", user.id);
     setBusy(false);
     if (error) {
@@ -91,7 +93,16 @@ function SettingsPage() {
             </div>
             <div>
               <Label>رقم الجوال</Label>
-              <Input className="mt-1.5" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <div className="mt-1.5 flex items-center gap-2">
+                <Input
+                  type="tel"
+                  inputMode="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="05xxxxxxxx أو +9665xxxxxxxx"
+                />
+                <WhatsAppButton phone={phone} message={whatsappMessage(profile?.full_name)} compact />
+              </div>
             </div>
             <Button onClick={() => void saveProfile()} disabled={busy}>
               حفظ التغييرات

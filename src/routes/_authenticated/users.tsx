@@ -5,6 +5,7 @@ import { ShieldCheck, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { BrandAvatar } from "@/components/app/Logo";
+import { WhatsAppButton } from "@/components/app/WhatsAppButton";
 import {
   Select,
   SelectContent,
@@ -25,6 +26,7 @@ import { api, qk } from "@/lib/data";
 import { useAuth } from "@/lib/auth-context";
 import { useSchool } from "@/lib/school-context";
 import { formatDate, formatDateTime, roleLabels, type AppRole } from "@/lib/labels";
+import { whatsappMessage } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/users")({
   head: () => ({
@@ -197,6 +199,11 @@ function UsersPage() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
+                    <WhatsAppButton
+                      phone={person.phone}
+                      message={whatsappMessage(person.full_name, "تواصل من إدارة المدرسة")}
+                      compact
+                    />
                     {membership ? (
                       <Chip tone={membership.status === "active" ? "leaf" : "gold"}>
                         {membership.status === "active" ? "نشط" : "بانتظار التفعيل"}

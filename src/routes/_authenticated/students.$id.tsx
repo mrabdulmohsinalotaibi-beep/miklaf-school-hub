@@ -2,9 +2,11 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { Chip, EmptyState, LoadingRows, PageHeader, Panel } from "@/components/app/ui-kit";
+import { WhatsAppButton } from "@/components/app/WhatsAppButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { attendanceLabels, caseStatusLabels, formatDate } from "@/lib/labels";
+import { whatsappMessage } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/students/$id")({
   head: () => ({
@@ -72,6 +74,13 @@ function StudentProfilePage() {
           { label: "سجل الطلاب", to: "/students" },
           { label: row.full_name },
         ]}
+        action={
+          <WhatsAppButton
+            phone={row.guardian_phone}
+            message={whatsappMessage(row.full_name, "متابعة مدرسية")}
+            label="مراسلة ولي الأمر"
+          />
+        }
       />
 
       <Tabs defaultValue="academic" dir="rtl">
@@ -88,7 +97,16 @@ function StudentProfilePage() {
               <Field label="الصف" value={row.grade} />
               <Field label="الحالة" value={row.status} />
               <Field label="ولي الأمر" value={row.guardian_name ?? "—"} />
-              <Field label="جوال ولي الأمر" value={row.guardian_phone ?? "—"} />
+              <div className="flex items-end gap-2">
+                <div className="min-w-0 flex-1">
+                  <Field label="جوال ولي الأمر" value={row.guardian_phone ?? "—"} />
+                </div>
+                <WhatsAppButton
+                  phone={row.guardian_phone}
+                  message={whatsappMessage(row.full_name)}
+                  compact
+                />
+              </div>
             </dl>
           </Panel>
         </TabsContent>

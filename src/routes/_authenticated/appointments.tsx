@@ -23,11 +23,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Chip, EmptyState, LoadingRows, PageHeader, Panel } from "@/components/app/ui-kit";
+import { WhatsAppButton } from "@/components/app/WhatsAppButton";
 import { supabase } from "@/integrations/supabase/client";
 import { api, qk } from "@/lib/data";
 import { useAuth } from "@/lib/auth-context";
 import { formatDateTime, isoDate } from "@/lib/labels";
 import { cn } from "@/lib/utils";
+import { whatsappMessage } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/appointments")({
   head: () => ({
@@ -75,6 +77,7 @@ function AppointmentsPage() {
   const dayItems = (appointments.data ?? []).filter(
     (item) => item.starts_at.slice(0, 10) === selectedDay,
   );
+  const selectedStudent = (students.data ?? []).find((student) => student.id === form.student_id);
 
   const monthLabel = new Intl.DateTimeFormat("ar-SA-u-ca-gregory", {
     month: "long",
@@ -187,7 +190,7 @@ function AppointmentsPage() {
                     <SelectTrigger>
                       <SelectValue placeholder="اختياري" />
                     </SelectTrigger>
-                    <SelectContent>
+                  <SelectContent>
                       {(students.data ?? []).map((student) => (
                         <SelectItem key={student.id} value={student.id}>
                           {student.full_name}
@@ -195,6 +198,16 @@ function AppointmentsPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {selectedStudent?.guardian_phone && (
+                    <div className="mt-2 flex items-center justify-between rounded-xl bg-muted/60 px-3 py-2 text-xs">
+                      <span>ولي الأمر: {selectedStudent.guardian_phone}</span>
+                      <WhatsAppButton
+                        phone={selectedStudent.guardian_phone}
+                        message={whatsappMessage(selectedStudent.full_name, "تأكيد موعد المقابلة")}
+                        label="إرسال تذكير"
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
@@ -317,9 +330,19 @@ function AppointmentsPage() {
                       <Trash2 size={15} className="text-destructive" />
                     </Button>
                   </div>
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Chip tone="sea">{item.type}</Chip>
                     {item.with_person && <Chip tone="muted">{item.with_person}</Chip>}
+                    {(() => {
+                      const appointmentStudent = (students.data ?? []).find((student) => student.id === item.student_id);
+                      return appointmentStudent?.guardian_phone ? (
+                        <WhatsAppButton
+                          phone={appointmentStudent.guardian_phone}
+                          message={whatsappMessage(appointmentStudent.full_name, "تذكير بالموعد")}
+                          compact
+                        />
+                      ) : null;
+                    })()}
                   </div>
                 </div>
               ))}

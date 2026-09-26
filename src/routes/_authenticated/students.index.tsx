@@ -23,6 +23,7 @@ import {
   PageHeader,
   Panel,
 } from "@/components/app/ui-kit";
+import { WhatsAppButton } from "@/components/app/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -52,6 +53,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { api, qk, type StudentRow } from "@/lib/data";
 import { downloadStudentImportTemplate, exportToExcel } from "@/lib/export";
 import { grades, studentStatuses } from "@/lib/labels";
+import { normalizePhone, whatsappMessage } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/_authenticated/students/")({
   head: () => ({
@@ -164,7 +166,7 @@ function StudentsPage() {
         grade: values.grade,
         class_id: values.class_id || null,
         guardian_name: values.guardian_name || null,
-        guardian_phone: values.guardian_phone || null,
+        guardian_phone: normalizePhone(values.guardian_phone) || null,
         status: values.status,
         average: Number(values.average) || 0,
         nationality: values.nationality.trim() || null,
@@ -258,7 +260,7 @@ function StudentsPage() {
           grade: text("grade") || grades[0],
           class_name: className,
           guardian_name: text("guardianName"),
-          guardian_phone: text("guardianPhone"),
+          guardian_phone: normalizePhone(text("guardianPhone")) ?? "",
           class_id: matchedClass?.id ?? null,
           valid: !blockingIssue,
           issue: [blockingIssue, ...warnings].filter(Boolean).join("، "),
@@ -285,7 +287,7 @@ function StudentsPage() {
         grade: row.grade,
         class_id: row.class_id,
         guardian_name: row.guardian_name || null,
-        guardian_phone: row.guardian_phone || null,
+        guardian_phone: normalizePhone(row.guardian_phone) || null,
         status: "منتظم",
         average: 0,
       })),
@@ -447,7 +449,14 @@ function StudentsPage() {
                     <TableCell>{student.grade}</TableCell>
                     <TableCell>{student.nationality ?? "—"}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {student.guardian_name ?? "—"} · {student.guardian_phone ?? "—"}
+                      <div className="flex items-center gap-2">
+                        <span>{student.guardian_name ?? "—"} · {student.guardian_phone ?? "—"}</span>
+                        <WhatsAppButton
+                          phone={student.guardian_phone}
+                          message={whatsappMessage(student.full_name)}
+                          compact
+                        />
+                      </div>
                     </TableCell>
                     <TableCell>{Number(student.average)}</TableCell>
                     <TableCell>
@@ -594,6 +603,8 @@ function StudentsPage() {
               <Label>جوال ولي الأمر</Label>
               <Input
                 className="mt-1.5"
+                type="tel"
+                inputMode="tel"
                 value={form.guardian_phone}
                 onChange={(event) => setForm({ ...form, guardian_phone: event.target.value })}
               />
