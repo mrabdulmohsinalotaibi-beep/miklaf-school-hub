@@ -5,6 +5,8 @@
  * that leaves the system still looks like it came from مِكلاف.
  */
 
+import * as XLSX from "xlsx";
+
 const BRAND_INK = "#7e2320";
 const BRAND_DEEP = "#4a1513";
 const BRAND_PAPER = "#fbf1ef";
@@ -28,43 +30,47 @@ export function exportToExcel(
   rows: (string | number)[][],
   meta?: { schoolName?: string; preparedBy?: string },
 ) {
-  const title = escapeHtml(fileName);
-  const school = escapeHtml(meta?.schoolName ?? "مدرسة مِكلاف");
-  const preparedBy = escapeHtml(meta?.preparedBy ?? "إدارة المدرسة");
-  const stamp = escapeHtml(new Date().toLocaleString("ar-SA"));
+  const sheetRows = [
+    [`منصة مِكلاف — ${meta?.schoolName ?? "مدرسة مِكلاف"}`],
+    [`${meta?.preparedBy ?? "إدارة المدرسة"} | ${new Date().toLocaleString("ar-SA")}`],
+    [],
+    headers,
+    ...rows,
+  ];
+  const sheet = XLSX.utils.aoa_to_sheet(sheetRows);
+  sheet["!cols"] = headers.map((header) => ({ wch: Math.max(14, Math.min(34, header.length + 8)) }));
+  sheet["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: Math.max(0, headers.length - 1) } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: Math.max(0, headers.length - 1) } },
+  ];
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, sheet, "التقرير");
+  XLSX.writeFile(workbook, `${fileName}.xlsx`, { compression: true, bookType: "xlsx" });
+}
 
-  const html = `<html dir="rtl" lang="ar"><head><meta charset="utf-8" />
-    <style>
-      table { border-collapse: collapse; }
-      th, td { border: 1px solid #c9b6b2; padding: 6px 9px; text-align: right; }
-      th { background: ${BRAND_INK}; color: #fff; }
-    </style></head><body>
-    <table>
-      <tr><td colspan="${headers.length}" style="border:0;background:${BRAND_PAPER};font-weight:bold;">
-        ${title} — ${school}
-      </td></tr>
-      <tr><td colspan="${headers.length}" style="border:0;font-size:11px;color:#6d5f5d;">
-        منصة مِكلاف | أُعدّ بواسطة: ${preparedBy} | ${stamp}
-      </td></tr>
-      <tr><th>${headers.map(escapeHtml).join("</th><th>")}</th></tr>
-      ${rows
-        .map(
-          (row) =>
-            `<tr>${row
-              .map((cell) => `<td>${escapeHtml(cell)}</td>`)
-              .join("")}</tr>`,
-        )
-        .join("")}
-    </table>
-  </body></html>`;
-
-  const blob = new Blob(["\ufeff", html], { type: "application/vnd.ms-excel;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `${fileName}.xls`;
-  link.click();
-  URL.revokeObjectURL(url);
+/** Download a clean, bilingual-friendly template with instructions as a second sheet. */
+export function downloadStudentImportTemplate() {
+  const headers = [
+    "اسم الطالب",
+    "رقم الهوية / السجل المدني",
+    "الجنسية",
+    "الصف الدراسي",
+    "الفصل",
+    "اسم ولي الأمر",
+    "رقم جوال ولي الأمر",
+  ];
+  const example = ["أحمد محمد العتيبي", "1000000000", "سعودي", "أول ثانوي", "1/1", "محمد العتيبي", "0500000000"];
+  const instructions = [
+    ["قالب استيراد طلاب منصة مِكلاف"],
+    ["احذف الصف التجريبي قبل رفع الملف، ثم احفظه بصيغة XLSX أو CSV."],
+    ["الاسم ورقم الهوية مهمان لمنع التكرار. الصف والفصل يجب أن يطابقا بيانات المدرسة."],
+  ];
+  const workbook = XLSX.utils.book_new();
+  const data = XLSX.utils.aoa_to_sheet([headers, example]);
+  data["!cols"] = headers.map((header) => ({ wch: Math.max(18, header.length + 8) }));
+  XLSX.utils.book_append_sheet(workbook, data, "بيانات الطلاب");
+  XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(instructions), "تعليمات");
+  XLSX.writeFile(workbook, "قالب-استيراد-طلاب-مكلاف.xlsx", { compression: true });
 }
 
 export function printReport(

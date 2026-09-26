@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CheckCircle2,
+  Download,
   FileSpreadsheet,
   Pencil,
   Plus,
@@ -49,6 +50,7 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { api, qk, type StudentRow } from "@/lib/data";
+import { downloadStudentImportTemplate, exportToExcel } from "@/lib/export";
 import { grades, studentStatuses } from "@/lib/labels";
 
 export const Route = createFileRoute("/_authenticated/students/")({
@@ -90,6 +92,29 @@ type ImportRow = {
   valid: boolean;
   issue?: string;
 };
+
+const importHeaders: Record<string, string> = {
+  "اسم الطالب": "name",
+  الاسم: "name",
+  "رقم الهوية / السجل المدني": "studentNo",
+  "رقم الهوية": "studentNo",
+  "رقم الطالب": "studentNo",
+  الجنسية: "nationality",
+  "الصف الدراسي": "grade",
+  الصف: "grade",
+  الفصل: "className",
+  "اسم ولي الأمر": "guardianName",
+  "ولي الأمر": "guardianName",
+  "رقم جوال ولي الأمر": "guardianPhone",
+  "جوال ولي الأمر": "guardianPhone",
+};
+
+function normalizeImportHeader(value: unknown) {
+  return String(value ?? "")
+    .replace(/[\u200f\u200e]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 const emptyForm: FormState = {
   student_no: "",
@@ -188,41 +213,55 @@ function StudentsPage() {
   const importExcel = async (file: File) => {
     setImportError("");
     try {
+      if (file.size > 8 * 1024 * 1024) throw new Error("حجم الملف أكبر من 8 ميجابايت.");
       const workbook = XLSX.read(await file.arrayBuffer(), { type: "array" });
       const firstSheetName = workbook.SheetNames[0];
       const sheet = firstSheetName ? workbook.Sheets[firstSheetName] : undefined;
       if (!sheet) throw new Error("الملف لا يحتوي على ورقة عمل.");
-      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      const rawRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      const rows = rawRows.map((raw) =>
+        Object.fromEntries(
+          Object.entries(raw).map(([key, value]) => [
+            importHeaders[normalizeImportHeader(key)] ?? normalizeImportHeader(key),
+            value,
+          ]),
+        ),
+      );
       if (rows.length === 0) throw new Error("لا توجد بيانات بعد صف العناوين.");
-      // Missing columns are treated as blank values so the available data is still imported.
+      const availableHeaders = Object.keys(rows[0] ?? {});
+      if (!availableHeaders.some((key) => key === "name" || key === "studentNo")) {
+        throw new Error("لم نتعرف على عناوين الأعمدة. نزّل قالب الاستيراد واستخدم عناوينه.");
+      }
       const classRows = classes.data ?? [];
       const usedNumbers = new Set((students.data ?? []).map((student) => student.student_no));
+      const fileNumbers = new Set<string>();
       const parsed = rows.map((row, index) => {
         const text = (key: string) => String(row[key] ?? "").trim();
-        const className = text("الفصل");
+        const className = text("className");
         const matchedClass = classRows.find((item) => item.name.trim() === className);
-        const originalName = text("اسم الطالب");
-        const originalNumber = text("رقم الهوية / السجل المدني");
+        const originalName = text("name");
+        const originalNumber = text("studentNo");
+        const duplicate = Boolean(originalNumber && (usedNumbers.has(originalNumber) || fileNumbers.has(originalNumber)));
         let studentNo = originalNumber || `IMPORT-${Date.now()}-${index + 1}`;
-        while (usedNumbers.has(studentNo)) studentNo = `${studentNo}-${index + 1}`;
-        usedNumbers.add(studentNo);
-        const fullName = originalName || `غير محدد — ${studentNo}`;
+        while (usedNumbers.has(studentNo) || fileNumbers.has(studentNo)) studentNo = `${studentNo}-${index + 1}`;
+        fileNumbers.add(studentNo);
         const warnings = [
-          !originalName ? "الاسم ناقص" : "",
-          !originalNumber ? "رقم الهوية ناقص وتم إنشاء رقم مؤقت" : "",
+          !originalNumber ? "رقم الهوية ناقص — تم إنشاء رقم مؤقت" : "",
           className && !matchedClass ? "الفصل غير موجود" : "",
+          duplicate ? "رقم الهوية مكرر — لن يُحفظ" : "",
         ].filter(Boolean);
+        const blockingIssue = !originalName ? "اسم الطالب مطلوب" : duplicate ? "رقم الهوية مكرر" : "";
         return {
-          full_name: fullName,
+          full_name: originalName,
           student_no: studentNo,
-          nationality: text("الجنسية"),
-          grade: text("الصف الدراسي") || grades[0],
+          nationality: text("nationality"),
+          grade: text("grade") || grades[0],
           class_name: className,
-          guardian_name: text("اسم ولي الأمر"),
-          guardian_phone: text("رقم جوال ولي الأمر"),
+          guardian_name: text("guardianName"),
+          guardian_phone: text("guardianPhone"),
           class_id: matchedClass?.id ?? null,
-          valid: true,
-          issue: warnings.join("، "),
+          valid: !blockingIssue,
+          issue: [blockingIssue, ...warnings].filter(Boolean).join("، "),
         } satisfies ImportRow;
       });
       setImportRows(parsed);
@@ -272,10 +311,17 @@ function StudentsPage() {
         title="سجل الطلاب"
         description="جميع الطلاب المسجلين في المدرسة مع بياناتهم الأساسية."
         crumbs={[{ label: "الرئيسية", to: "/dashboard" }, { label: "سجل الطلاب" }]}
-        action={
-          <div className="flex flex-wrap gap-2">
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-bold transition-colors hover:bg-muted">
-              <Upload size={16} /> استيراد Excel
+          action={
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                onClick={() => downloadStudentImportTemplate()}
+                title="تحميل ملف Excel جاهز بالعناوين والتعليمات"
+              >
+                <FileSpreadsheet size={16} /> قالب الاستيراد
+              </Button>
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-bold transition-colors hover:bg-muted">
+                <Upload size={16} /> استيراد Excel
               <input
                 type="file"
                 accept=".xlsx,.xls"
@@ -286,8 +332,31 @@ function StudentsPage() {
                   event.target.value = "";
                 }}
               />
-            </label>
-            <Button
+              </label>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  exportToExcel(
+                    "سجل-الطلاب",
+                    ["رقم الطالب", "اسم الطالب", "الصف", "الجنسية", "ولي الأمر", "الجوال", "الحالة", "المعدل"],
+                    filtered.map((student) => [
+                      student.student_no,
+                      student.full_name,
+                      student.grade,
+                      student.nationality ?? "—",
+                      student.guardian_name ?? "—",
+                      student.guardian_phone ?? "—",
+                      student.status,
+                      Number(student.average),
+                    ]),
+                  )
+                }
+                disabled={!filtered.length}
+                title="تصدير النتائج الحالية بعد البحث والتصفية"
+              >
+                <Download size={16} /> تصدير السجل
+              </Button>
+              <Button
               onClick={() => {
                 setForm(emptyForm);
                 setOpen(true);
@@ -588,16 +657,23 @@ function StudentsPage() {
             <div className="rounded-xl border border-rose/30 bg-rose-soft p-4 text-sm text-rose">
               {importError}
               <p className="mt-2 text-xs text-muted-foreground">
-                يجب أن تكون عناوين الأعمدة مطابقة للنموذج المرفق تمامًا.
+                نزّل قالب الاستيراد من الصفحة، أو استخدم العناوين العربية المعروفة؛ سيحاول النظام توحيدها تلقائيًا.
               </p>
             </div>
           ) : (
             <>
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-sea-soft p-4 text-sm">
                 <span>تمت قراءة {importRows.length} صفًا. راجع المعاينة قبل الحفظ.</span>
-                <span className="font-bold text-sea">
-                  {importRows.filter((row) => row.valid).length} صالح للحفظ
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="font-bold text-sea">
+                    {importRows.filter((row) => row.valid).length} صالح للحفظ
+                  </span>
+                  {importRows.some((row) => !row.valid) && (
+                    <span className="font-bold text-rose">
+                      {importRows.filter((row) => !row.valid).length} يحتاج مراجعة
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="max-h-[48vh] overflow-auto rounded-xl border border-border">
                 <Table>
@@ -616,11 +692,17 @@ function StudentsPage() {
                     {importRows.slice(0, 100).map((row, index) => (
                       <TableRow key={`${row.student_no}-${index}`}>
                         <TableCell>
-                          {row.valid ? (
-                            <CheckCircle2 size={17} className="text-sea" aria-label="صالح" />
-                          ) : (
-                            <span className="text-xs text-rose">{row.issue}</span>
-                          )}
+                          <div className="flex min-w-28 items-center gap-1.5">
+                            <CheckCircle2
+                              size={17}
+                              className={row.valid ? "text-sea" : "text-rose"}
+                              aria-label={row.valid ? "صالح" : "يحتاج مراجعة"}
+                            />
+                            <span className={`text-xs font-bold ${row.valid ? "text-sea" : "text-rose"}`}>
+                              {row.valid ? "جاهز" : "مراجعة"}
+                            </span>
+                          </div>
+                          {row.issue && <div className="mt-1 text-[10px] text-muted-foreground">{row.issue}</div>}
                         </TableCell>
                         <TableCell className="font-bold">{row.full_name || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{row.student_no || "—"}</TableCell>
